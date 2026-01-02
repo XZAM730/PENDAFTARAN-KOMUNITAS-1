@@ -1,275 +1,174 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IEA · Astral Gate</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>IEA Cosmic Core System</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 :root{
- --bg:#020617;
- --panel:rgba(255,255,255,.045);
- --line:rgba(255,255,255,.08);
- --glow:#93c5fd;
- --accent:#818cf8;
+  --primary:#00e5ff;
+  --secondary:#4f7cff;
+  --bg:#030616;
 }
 *{box-sizing:border-box}
 body{
- margin:0;
- min-height:100vh;
- font-family:"Space Grotesk",sans-serif;
- background:
-  radial-gradient(1200px 600px at 15% 10%,#0f172a,transparent 50%),
-  radial-gradient(1000px 500px at 85% 80%,#020617,transparent 55%),
-  #020617;
- color:#e5e7eb;
- overflow-x:hidden;
+  margin:0;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  background:radial-gradient(circle at top,var(--bg),#000);
+  color:#fff;
 }
-canvas#space{position:fixed;inset:0;z-index:-1}
-.hidden{display:none}
-.container{max-width:1180px;margin:auto;padding:64px 28px}
-.panel{
- background:linear-gradient(180deg,var(--panel),transparent);
- border-radius:28px;
- padding:36px;
- border:1px solid var(--line);
- backdrop-filter:blur(20px);
- box-shadow:inset 0 0 60px rgba(147,197,253,.03),0 60px 160px rgba(0,0,0,.85);
+h1,h2,h3{
+  font-family:'Orbitron',sans-serif;
+  letter-spacing:2px;
 }
-h1{font-size:2.6rem;margin:0 0 8px;text-shadow:0 0 20px rgba(147,197,253,.25)}
-p{color:#9ca3af}
-label{
- font-family:"JetBrains Mono",monospace;
- font-size:13px;
- color:#9ca3af;
- margin-top:18px;
- display:block;
+.container{max-width:1300px;margin:auto;padding:50px}
+.card{
+  background:rgba(255,255,255,.05);
+  backdrop-filter:blur(18px);
+  border-radius:26px;
+  padding:35px;
+  margin-bottom:40px;
+  box-shadow:0 0 80px rgba(0,229,255,.2);
 }
-input,textarea,button{
- width:100%;
- padding:16px 18px;
- margin-top:8px;
- border-radius:16px;
- border:1px solid var(--line);
- background:#020617;
- color:#fff;
- font-size:15px;
+input,textarea{
+  width:100%;
+  padding:16px;
+  margin-top:14px;
+  border-radius:16px;
+  border:none;
+  background:rgba(0,0,0,.7);
+  color:var(--primary);
+  font-size:15px;
 }
-textarea{min-height:110px;resize:none}
 button{
- margin-top:22px;
- background:linear-gradient(135deg,var(--accent),var(--glow));
- color:#020617;
- font-weight:700;
- cursor:pointer;
- transition:.3s;
+  margin-top:22px;
+  padding:16px 40px;
+  border-radius:60px;
+  border:none;
+  background:linear-gradient(135deg,var(--secondary),var(--primary));
+  color:#000;
+  font-weight:800;
+  letter-spacing:1px;
+  cursor:pointer;
 }
-button:hover{transform:translateY(-2px)}
-.grid{
- display:grid;
- grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
- gap:26px;
- margin-top:32px;
-}
-.stat{
- font-size:2.8rem;
- font-weight:700;
- color:var(--glow);
- font-family:"JetBrains Mono",monospace;
-}
-.list-item{
- padding:14px 0;
- border-bottom:1px solid var(--line);
-}
-.list-item a{
- color:var(--glow);
- text-decoration:none;
- font-family:"JetBrains Mono",monospace;
- font-size:13px;
-}
-.list-item a:hover{text-decoration:underline}
-.admin-btn{
- position:fixed;
- bottom:28px;
- right:28px;
- padding:14px 24px;
- border-radius:999px;
- background:#020617;
- color:var(--glow);
- border:1px solid var(--line);
- cursor:pointer;
- font-family:"JetBrains Mono",monospace;
-}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:30px}
+.stat{font-size:52px;font-weight:800;color:var(--primary)}
+table{width:100%;border-collapse:collapse;margin-top:25px}
+th,td{padding:14px;border-bottom:1px solid rgba(255,255,255,.12)}
+a{color:var(--primary);text-decoration:none}
+.hidden{display:none}
 </style>
 </head>
-
 <body>
-
-<canvas id="space"></canvas>
-
-<audio id="typeSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_4c7a0b5b9c.mp3"></audio>
-
 <div class="container">
 
-<!-- USER -->
-<section id="userView" class="panel">
-<h1>IEA · Astral Gate</h1>
-<p>Gerbang seleksi komunitas edukasi astronomi.</p>
+<h1>IEA COSMIC CORE SYSTEM</h1>
+<p>Sistem Pendaftaran, Monitoring, dan Analitik Komunitas</p>
 
-<form id="form">
-<label>Nama</label>
-<input id="nama" required>
+<div class="card" id="loginCard">
+<h2>Admin Access</h2>
+<input id="adminKey" placeholder="Admin Access Key">
+<button onclick="loginAdmin()">Masuk</button>
+</div>
 
-<label>Tanggal Lahir (≥15)</label>
-<input id="tgl" type="date" required>
+<div class="card hidden" id="formCard">
+<h2>Form Pendaftaran Anggota</h2>
+<input id="nama" placeholder="Nama Lengkap">
+<input id="lahir" type="date">
+<textarea id="tujuan" placeholder="Tujuan masuk komunitas"></textarea>
+<input id="tiktok" placeholder="Link TikTok">
+<button onclick="daftar()">Kirim Pendaftaran</button>
+</div>
 
-<label>Tujuan Masuk</label>
-<textarea id="tujuan" required></textarea>
-
-<label>Link TikTok</label>
-<input id="tiktok" placeholder="https://www.tiktok.com/@username" required>
-
-<button>ENTER ASTRAL ORBIT</button>
-</form>
-</section>
-
-<!-- ADMIN LOGIN -->
-<section id="loginView" class="panel hidden">
-<h1>Administrator Console</h1>
-<label>Admin Key</label>
-<input id="adminPass" type="password">
-<button onclick="login()">Authorize</button>
-</section>
-
-<!-- DASHBOARD -->
-<section id="adminView" class="hidden">
-<h1>Cosmic Observatory</h1>
-<p>Realtime community intelligence</p>
-
+<div class="card hidden" id="dashboard">
+<h2>Dashboard Admin</h2>
 <div class="grid">
-<div class="panel">
-<div>Total Pendaftar</div>
-<div id="total" class="stat">0</div>
-</div>
-<div class="panel"><canvas id="usia"></canvas></div>
-<div class="panel"><canvas id="harian"></canvas></div>
-<div class="panel"><canvas id="tujuanChart"></canvas></div>
-
-<!-- LIST PENDAFTAR -->
-<div class="panel">
-<h3 style="margin-top:0">Daftar Pendaftar</h3>
-<div id="list"></div>
-</div>
-</div>
-</section>
-
+  <div class="card"><div>Total Pendaftar</div><div class="stat" id="total">0</div></div>
+  <div class="card"><canvas id="chartUsia"></canvas></div>
+  <div class="card"><canvas id="chartTujuan"></canvas></div>
 </div>
 
-<div class="admin-btn" onclick="openAdmin()">ADMIN</div>
+<input id="search" placeholder="Cari nama atau TikTok">
 
-<script>
-/* STAR FIELD */
-const c=document.getElementById("space"),x=c.getContext("2d");
-function rs(){c.width=innerWidth;c.height=innerHeight}
-rs();onresize=rs;
-let pts=[...Array(200)].map(()=>({x:Math.random()*c.width,y:Math.random()*c.height,v:Math.random()*1+.2}));
-(function anim(){
- x.clearRect(0,0,c.width,c.height);
- pts.forEach(p=>{
-  x.fillStyle="rgba(255,255,255,.8)";
-  x.fillRect(p.x,p.y,1.5,1.5);
-  p.y+=p.v;
-  if(p.y>c.height)p.y=0;
- });
- requestAnimationFrame(anim);
-})();
+<table>
+<thead><tr><th>Nama</th><th>Usia</th><th>Tujuan</th><th>TikTok</th></tr></thead>
+<tbody id="list"></tbody>
+</table>
 
-/* CORE */
-const STORE="iea_astral";
-const ADMINS=["adminIEA1","adminIEA2","adminIEA3","adminIEA4"];
-const ch=new BroadcastChannel("astral");
-const snd=document.getElementById("typeSound");
-document.addEventListener("keydown",()=>snd.play());
+<button onclick="exportCSV()">Export CSV</button>
+</div>
+</div>
 
-form.onsubmit=e=>{
- e.preventDefault();
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
- let tiktokURL=tiktok.value.trim();
- if(!tiktokURL.startsWith("http")) tiktokURL="https://"+tiktokURL;
- if(!tiktokURL.includes("tiktok.com")){
-  alert("Link TikTok tidak valid");return;
- }
-
- const age=new Date().getFullYear()-new Date(tgl.value).getFullYear();
- if(age<15){alert("Minimal 15 tahun");return;}
-
- const d={
-  nama:nama.value,
-  tgl:tgl.value,
-  tujuan:tujuan.value,
-  tiktok:tiktokURL,
-  w:new Date().toISOString()
- };
-
- const a=JSON.parse(localStorage.getItem(STORE))||[];
- a.push(d);
- localStorage.setItem(STORE,JSON.stringify(a));
- ch.postMessage("u");
- location.href="https://chat.whatsapp.com/DUOPhz2B44v7PPnBMqxScX";
+const firebaseConfig = {
+  apiKey: "AIzaSyA4lpo6PyADXVVki-bBfcEFf0kxbQuunN8",
+  authDomain: "iea-pendaftaran.firebaseapp.com",
+  projectId: "iea-pendaftaran",
+  storageBucket: "iea-pendaftaran.firebasestorage.app",
+  messagingSenderId: "383473027982",
+  appId: "1:383473027982:web:679f4c56665f9cb39832df"
 };
 
-function openAdmin(){
- userView.classList.add("hidden");
- loginView.classList.remove("hidden");
-}
-function login(){
- if(!ADMINS.includes(adminPass.value)){alert("Invalid key");return;}
- loginView.classList.add("hidden");
- adminView.classList.remove("hidden");
- load();
-}
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-const usiaC=new Chart(usia,{type:"doughnut",data:{labels:["15–18","19–25","26+"],datasets:[{data:[0,0,0]}]}});
-const hariC=new Chart(harian,{type:"line",data:{labels:[],datasets:[{data:[],tension:.4}]}});
-const tujC=new Chart(tujuanChart,{type:"bar",data:{labels:[],datasets:[{data:[]}]} });
+const ADMIN_KEY = "IEA-ADMIN-CORE";
+window.loginAdmin = () => {
+  if(document.getElementById('adminKey').value === ADMIN_KEY){
+    loginCard.classList.add('hidden');
+    formCard.classList.remove('hidden');
+    dashboard.classList.remove('hidden');
+  } else alert('Akses ditolak');
+};
 
-function load(){
- const d=JSON.parse(localStorage.getItem(STORE))||[];
- total.textContent=d.length;
+window.daftar = async () => {
+  const nama=nama.value, lahir=lahir.value, tujuan=tujuan.value, tiktok=tiktok.value;
+  if(!nama||!lahir||!tiktok) return alert('Lengkapi data');
+  const usia=new Date().getFullYear()-new Date(lahir).getFullYear();
+  if(usia<15) return alert('Minimal usia 15 tahun');
+  await addDoc(collection(db,'pendaftar'),{nama,lahir,tujuan,tiktok,waktu:new Date()});
+  alert('Pendaftaran berhasil');
+};
 
- let u=[0,0,0],h={},k={};
- const list=document.getElementById("list");
- list.innerHTML="";
+let chartUsia, chartTujuan;
+const q=query(collection(db,'pendaftar'),orderBy('waktu','desc'));
 
- d.slice().reverse().forEach(x=>{
-  const ag=new Date().getFullYear()-new Date(x.tgl).getFullYear();
-  ag<=18?u[0]++:ag<=25?u[1]++:u[2]++;
-  const da=x.w.split("T")[0];
-  h[da]=(h[da]||0)+1;
-  x.tujuan.toLowerCase().split(/\W+/).forEach(w=>{
-   if(w.length>3)k[w]=(k[w]||0)+1;
+onSnapshot(q,snap=>{
+  total.innerText=snap.size;
+  list.innerHTML='';
+  let usiaData={}, tujuanData={};
+  snap.forEach(doc=>{
+    const d=doc.data();
+    const usia=new Date().getFullYear()-new Date(d.lahir).getFullYear();
+    usiaData[usia]=(usiaData[usia]||0)+1;
+    const key=d.tujuan?.split(' ')[0]||'Lainnya';
+    tujuanData[key]=(tujuanData[key]||0)+1;
+    list.innerHTML+=`<tr><td>${d.nama}</td><td>${usia}</td><td>${d.tujuan||'-'}</td><td><a href="${d.tiktok}" target="_blank">${d.tiktok}</a></td></tr>`;
   });
+  if(chartUsia) chartUsia.destroy();
+  chartUsia=new Chart(chartUsiaEl,{type:'bar',data:{labels:Object.keys(usiaData),datasets:[{data:Object.values(usiaData)}]},options:{plugins:{legend:{display:false}}}});
+  if(chartTujuan) chartTujuan.destroy();
+  chartTujuan=new Chart(chartTujuanEl,{type:'pie',data:{labels:Object.keys(tujuanData),datasets:[{data:Object.values(tujuanData)}]}});
+});
 
-  const row=document.createElement("div");
-  row.className="list-item";
-  row.innerHTML=`<strong>${x.nama}</strong><br>
-  <a href="${x.tiktok}" target="_blank">${x.tiktok}</a>`;
-  list.appendChild(row);
- });
-
- usiaC.data.datasets[0].data=u;usiaC.update();
- hariC.data.labels=Object.keys(h);
- hariC.data.datasets[0].data=Object.values(h);hariC.update();
- const top=Object.entries(k).sort((a,b)=>b[1]-a[1]).slice(0,6);
- tujC.data.labels=top.map(x=>x[0]);
- tujC.data.datasets[0].data=top.map(x=>x[1]);
- tujC.update();
-}
-ch.onmessage=load;
+window.exportCSV = () => {
+  let csv='Nama,Usia,Tujuan,TikTok\n';
+  document.querySelectorAll('#list tr').forEach(r=>{
+    const c=r.children;
+    csv+=`${c[0].innerText},${c[1].innerText},"${c[2].innerText}",${c[3].innerText}\n`;
+  });
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='pendaftar.csv';
+  a.click();
+};
 </script>
-
 </body>
 </html>
