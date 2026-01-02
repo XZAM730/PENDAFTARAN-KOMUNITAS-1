@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IEA · Astral Gate</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root{
+ --bg:#020617;
+ --panel:rgba(255,255,255,.045);
+ --line:rgba(255,255,255,.08);
+ --glow:#93c5fd;
+ --accent:#818cf8;
+}
+*{box-sizing:border-box}
+body{
+ margin:0;
+ min-height:100vh;
+ font-family:"Space Grotesk",sans-serif;
+ background:
+  radial-gradient(1200px 600px at 15% 10%,#0f172a,transparent 50%),
+  radial-gradient(1000px 500px at 85% 80%,#020617,transparent 55%),
+  #020617;
+ color:#e5e7eb;
+ overflow-x:hidden;
+}
+canvas#space{
+ position:fixed;
+ inset:0;
+ z-index:-1;
+}
+.hidden{display:none}
+.container{
+ max-width:1180px;
+ margin:auto;
+ padding:64px 28px;
+}
+.panel{
+ background:linear-gradient(180deg,var(--panel),transparent);
+ border-radius:28px;
+ padding:36px;
+ border:1px solid var(--line);
+ backdrop-filter:blur(20px);
+ box-shadow:
+  inset 0 0 60px rgba(147,197,253,.03),
+  0 60px 160px rgba(0,0,0,.85);
+ animation:enter .8s ease forwards;
+}
+@keyframes enter{
+ from{opacity:0;transform:translateY(24px)}
+ to{opacity:1}
+}
+h1{
+ font-size:2.6rem;
+ margin:0 0 8px;
+ letter-spacing:.4px;
+ text-shadow:0 0 20px rgba(147,197,253,.25);
+}
+p{color:#9ca3af;max-width:520px}
+label{
+ font-family:"JetBrains Mono",monospace;
+ font-size:13px;
+ color:#9ca3af;
+ margin-top:18px;
+ display:block;
+}
+input,textarea,button{
+ width:100%;
+ padding:16px 18px;
+ margin-top:8px;
+ border-radius:16px;
+ border:1px solid var(--line);
+ background:#020617;
+ color:#fff;
+ font-size:15px;
+}
+textarea{min-height:110px;resize:none}
+button{
+ margin-top:22px;
+ background:linear-gradient(135deg,var(--accent),var(--glow));
+ color:#020617;
+ font-weight:700;
+ cursor:pointer;
+ transition:.3s;
+}
+button:hover{transform:translateY(-2px)}
+.grid{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+ gap:26px;
+ margin-top:32px;
+}
+.stat{
+ font-size:2.8rem;
+ font-weight:700;
+ color:var(--glow);
+ font-family:"JetBrains Mono",monospace;
+}
+.admin-btn{
+ position:fixed;
+ bottom:28px;
+ right:28px;
+ padding:14px 24px;
+ border-radius:999px;
+ background:#020617;
+ color:var(--glow);
+ border:1px solid var(--line);
+ cursor:pointer;
+ font-family:"JetBrains Mono",monospace;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="space"></canvas>
+
+<audio id="typeSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_4c7a0b5b9c.mp3"></audio>
+
+<div class="container">
+
+<!-- USER -->
+<section id="userView" class="panel">
+<h1>IEA · Astral Gate</h1>
+<p>Gerbang seleksi komunitas edukasi astronomi.  
+Bukan semua orang masuk.</p>
+
+<form id="form">
+<label>Nama</label>
+<input id="nama" required>
+
+<label>Tanggal Lahir (≥15)</label>
+<input id="tgl" type="date" required>
+
+<label>Tujuan Masuk</label>
+<textarea id="tujuan" required></textarea>
+
+<label>Link TikTok</label>
+<input id="tiktok" required>
+
+<button>ENTER ASTRAL ORBIT</button>
+</form>
+</section>
+
+<!-- ADMIN LOGIN -->
+<section id="loginView" class="panel hidden">
+<h1>Administrator Console</h1>
+<label>Admin Key</label>
+<input id="adminPass" type="password">
+<button onclick="login()">Authorize</button>
+</section>
+
+<!-- DASHBOARD -->
+<section id="adminView" class="hidden">
+<h1>Cosmic Observatory</h1>
+<p>Community intelligence · realtime</p>
+
+<div class="grid">
+<div class="panel">
+<div>Total Pendaftar</div>
+<div id="total" class="stat">0</div>
+</div>
+<div class="panel"><canvas id="usia"></canvas></div>
+<div class="panel"><canvas id="harian"></canvas></div>
+<div class="panel"><canvas id="tujuanChart"></canvas></div>
+</div>
+</section>
+
+</div>
+
+<div class="admin-btn" onclick="openAdmin()">ADMIN</div>
+
+<script>
+/* SPACE FIELD */
+const c=document.getElementById("space"),x=c.getContext("2d");
+function rs(){c.width=innerWidth;c.height=innerHeight}
+rs();onresize=rs;
+let pts=[...Array(220)].map(()=>({x:Math.random()*c.width,y:Math.random()*c.height,v:Math.random()*1.2+.2}));
+(function anim(){
+ x.clearRect(0,0,c.width,c.height);
+ pts.forEach(p=>{
+  x.fillStyle="rgba(255,255,255,.8)";
+  x.fillRect(p.x,p.y,1.5,1.5);
+  p.y+=p.v;
+  if(p.y>c.height)p.y=0;
+ });
+ requestAnimationFrame(anim);
+})();
+
+/* CORE */
+const STORE="iea_astral";
+const ADMINS=["adminIEA1","adminIEA2","adminIEA3","adminIEA4"];
+const ch=new BroadcastChannel("astral");
+const snd=document.getElementById("typeSound");
+document.addEventListener("keydown",()=>snd.play());
+
+form.onsubmit=e=>{
+ e.preventDefault();
+ const age=new Date().getFullYear()-new Date(tgl.value).getFullYear();
+ if(age<15){alert("Minimal 15 tahun");return;}
+ const d={nama:nama.value,tgl:tgl.value,tujuan:tujuan.value,tiktok:tiktok.value,w:new Date().toISOString()};
+ const a=JSON.parse(localStorage.getItem(STORE))||[];
+ a.push(d);
+ localStorage.setItem(STORE,JSON.stringify(a));
+ ch.postMessage("u");
+ location.href="https://chat.whatsapp.com/DUOPhz2B44v7PPnBMqxScX";
+};
+
+function openAdmin(){
+ userView.classList.add("hidden");
+ loginView.classList.remove("hidden");
+}
+function login(){
+ if(!ADMINS.includes(adminPass.value)){alert("Invalid key");return;}
+ loginView.classList.add("hidden");
+ adminView.classList.remove("hidden");
+ load();
+}
+
+const usiaC=new Chart(usia,{type:"doughnut",data:{labels:["15–18","19–25","26+"],datasets:[{data:[0,0,0]}]}});
+const hariC=new Chart(harian,{type:"line",data:{labels:[],datasets:[{data:[],tension:.4}]}});
+const tujC=new Chart(tujuanChart,{type:"bar",data:{labels:[],datasets:[{data:[]}]} });
+
+function load(){
+ const d=JSON.parse(localStorage.getItem(STORE))||[];
+ total.textContent=d.length;
+ let u=[0,0,0],h={},k={};
+ d.forEach(x=>{
+  const ag=new Date().getFullYear()-new Date(x.tgl).getFullYear();
+  ag<=18?u[0]++:ag<=25?u[1]++:u[2]++;
+  const da=x.w.split("T")[0];
+  h[da]=(h[da]||0)+1;
+  x.tujuan.toLowerCase().split(/\W+/).forEach(w=>{
+   if(w.length>3)k[w]=(k[w]||0)+1;
+  });
+ });
+ usiaC.data.datasets[0].data=u;usiaC.update();
+ hariC.data.labels=Object.keys(h);
+ hariC.data.datasets[0].data=Object.values(h);hariC.update();
+ const top=Object.entries(k).sort((a,b)=>b[1]-a[1]).slice(0,6);
+ tujC.data.labels=top.map(x=>x[0]);
+ tujC.data.datasets[0].data=top.map(x=>x[1]);
+ tujC.update();
+}
+ch.onmessage=load;
+</script>
+
+</body>
+</html>
