@@ -28,39 +28,19 @@ body{
  color:#e5e7eb;
  overflow-x:hidden;
 }
-canvas#space{
- position:fixed;
- inset:0;
- z-index:-1;
-}
+canvas#space{position:fixed;inset:0;z-index:-1}
 .hidden{display:none}
-.container{
- max-width:1180px;
- margin:auto;
- padding:64px 28px;
-}
+.container{max-width:1180px;margin:auto;padding:64px 28px}
 .panel{
  background:linear-gradient(180deg,var(--panel),transparent);
  border-radius:28px;
  padding:36px;
  border:1px solid var(--line);
  backdrop-filter:blur(20px);
- box-shadow:
-  inset 0 0 60px rgba(147,197,253,.03),
-  0 60px 160px rgba(0,0,0,.85);
- animation:enter .8s ease forwards;
+ box-shadow:inset 0 0 60px rgba(147,197,253,.03),0 60px 160px rgba(0,0,0,.85);
 }
-@keyframes enter{
- from{opacity:0;transform:translateY(24px)}
- to{opacity:1}
-}
-h1{
- font-size:2.6rem;
- margin:0 0 8px;
- letter-spacing:.4px;
- text-shadow:0 0 20px rgba(147,197,253,.25);
-}
-p{color:#9ca3af;max-width:520px}
+h1{font-size:2.6rem;margin:0 0 8px;text-shadow:0 0 20px rgba(147,197,253,.25)}
+p{color:#9ca3af}
 label{
  font-family:"JetBrains Mono",monospace;
  font-size:13px;
@@ -100,6 +80,17 @@ button:hover{transform:translateY(-2px)}
  color:var(--glow);
  font-family:"JetBrains Mono",monospace;
 }
+.list-item{
+ padding:14px 0;
+ border-bottom:1px solid var(--line);
+}
+.list-item a{
+ color:var(--glow);
+ text-decoration:none;
+ font-family:"JetBrains Mono",monospace;
+ font-size:13px;
+}
+.list-item a:hover{text-decoration:underline}
 .admin-btn{
  position:fixed;
  bottom:28px;
@@ -126,8 +117,7 @@ button:hover{transform:translateY(-2px)}
 <!-- USER -->
 <section id="userView" class="panel">
 <h1>IEA · Astral Gate</h1>
-<p>Gerbang seleksi komunitas edukasi astronomi.  
-Bukan semua orang masuk.</p>
+<p>Gerbang seleksi komunitas edukasi astronomi.</p>
 
 <form id="form">
 <label>Nama</label>
@@ -140,7 +130,7 @@ Bukan semua orang masuk.</p>
 <textarea id="tujuan" required></textarea>
 
 <label>Link TikTok</label>
-<input id="tiktok" required>
+<input id="tiktok" placeholder="https://www.tiktok.com/@username" required>
 
 <button>ENTER ASTRAL ORBIT</button>
 </form>
@@ -157,7 +147,7 @@ Bukan semua orang masuk.</p>
 <!-- DASHBOARD -->
 <section id="adminView" class="hidden">
 <h1>Cosmic Observatory</h1>
-<p>Community intelligence · realtime</p>
+<p>Realtime community intelligence</p>
 
 <div class="grid">
 <div class="panel">
@@ -167,6 +157,12 @@ Bukan semua orang masuk.</p>
 <div class="panel"><canvas id="usia"></canvas></div>
 <div class="panel"><canvas id="harian"></canvas></div>
 <div class="panel"><canvas id="tujuanChart"></canvas></div>
+
+<!-- LIST PENDAFTAR -->
+<div class="panel">
+<h3 style="margin-top:0">Daftar Pendaftar</h3>
+<div id="list"></div>
+</div>
 </div>
 </section>
 
@@ -175,11 +171,11 @@ Bukan semua orang masuk.</p>
 <div class="admin-btn" onclick="openAdmin()">ADMIN</div>
 
 <script>
-/* SPACE FIELD */
+/* STAR FIELD */
 const c=document.getElementById("space"),x=c.getContext("2d");
 function rs(){c.width=innerWidth;c.height=innerHeight}
 rs();onresize=rs;
-let pts=[...Array(220)].map(()=>({x:Math.random()*c.width,y:Math.random()*c.height,v:Math.random()*1.2+.2}));
+let pts=[...Array(200)].map(()=>({x:Math.random()*c.width,y:Math.random()*c.height,v:Math.random()*1+.2}));
 (function anim(){
  x.clearRect(0,0,c.width,c.height);
  pts.forEach(p=>{
@@ -200,9 +196,24 @@ document.addEventListener("keydown",()=>snd.play());
 
 form.onsubmit=e=>{
  e.preventDefault();
+
+ let tiktokURL=tiktok.value.trim();
+ if(!tiktokURL.startsWith("http")) tiktokURL="https://"+tiktokURL;
+ if(!tiktokURL.includes("tiktok.com")){
+  alert("Link TikTok tidak valid");return;
+ }
+
  const age=new Date().getFullYear()-new Date(tgl.value).getFullYear();
  if(age<15){alert("Minimal 15 tahun");return;}
- const d={nama:nama.value,tgl:tgl.value,tujuan:tujuan.value,tiktok:tiktok.value,w:new Date().toISOString()};
+
+ const d={
+  nama:nama.value,
+  tgl:tgl.value,
+  tujuan:tujuan.value,
+  tiktok:tiktokURL,
+  w:new Date().toISOString()
+ };
+
  const a=JSON.parse(localStorage.getItem(STORE))||[];
  a.push(d);
  localStorage.setItem(STORE,JSON.stringify(a));
@@ -228,8 +239,12 @@ const tujC=new Chart(tujuanChart,{type:"bar",data:{labels:[],datasets:[{data:[]}
 function load(){
  const d=JSON.parse(localStorage.getItem(STORE))||[];
  total.textContent=d.length;
+
  let u=[0,0,0],h={},k={};
- d.forEach(x=>{
+ const list=document.getElementById("list");
+ list.innerHTML="";
+
+ d.slice().reverse().forEach(x=>{
   const ag=new Date().getFullYear()-new Date(x.tgl).getFullYear();
   ag<=18?u[0]++:ag<=25?u[1]++:u[2]++;
   const da=x.w.split("T")[0];
@@ -237,7 +252,14 @@ function load(){
   x.tujuan.toLowerCase().split(/\W+/).forEach(w=>{
    if(w.length>3)k[w]=(k[w]||0)+1;
   });
+
+  const row=document.createElement("div");
+  row.className="list-item";
+  row.innerHTML=`<strong>${x.nama}</strong><br>
+  <a href="${x.tiktok}" target="_blank">${x.tiktok}</a>`;
+  list.appendChild(row);
  });
+
  usiaC.data.datasets[0].data=u;usiaC.update();
  hariC.data.labels=Object.keys(h);
  hariC.data.datasets[0].data=Object.values(h);hariC.update();
