@@ -1,17 +1,10 @@
-<!DOCTYPE html>
-<html lang="id">
+<!DOCTYPE html><html lang="id">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>IEA | Community Registration</title>
-
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
-
-<!-- Firebase -->
-<script type="module">
+<title>IEA | Community Registration</title><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet"><script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-  import { getDatabase, ref, set, onValue, push } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
+  import { getDatabase, ref, set, onValue, push, get } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyA4lpo6PyADXVVki-bBfcEFf0kxbQuunN8",
@@ -20,85 +13,86 @@
     projectId: "iea-pendaftaran",
     storageBucket: "iea-pendaftaran.firebasestorage.app",
     messagingSenderId: "383473027982",
-    appId: "1:383473027982:web:679f4c56665f9cb39832df",
-    measurementId: "G-X8135FF7CW"
+    appId: "1:383473027982:web:679f4c56665f9cb39832df"
   };
 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
-  window.submitForm = function() {
+  function isValidTikTok(url){
+    return /^https?:\/\/(www\.)?tiktok\.com\/@[a-zA-Z0-9._-]+/.test(url);
+  }
+
+  window.submitForm = async function(){
     const name = document.getElementById('name').value.trim();
     const age = parseInt(document.getElementById('age').value);
     const reason = document.getElementById('reason').value.trim();
     const tiktok = document.getElementById('tiktok').value.trim();
     const result = document.getElementById('result');
 
-    if(!name || !age || !tiktok){
-      result.innerHTML = '<div class="fail">Data belum lengkap.</div>';
-      return;
+    if(name.length < 3 || /[^a-zA-Z\s]/.test(name)){
+      result.innerHTML = '<div class="fail">Nama tidak valid. Gunakan nama asli.</div>'; return;
     }
 
-    if(age < 15){
-      result.innerHTML = '<div class="fail">Usia belum memenuhi syarat komunitas.</div>';
-      return;
+    if(isNaN(age) || age < 15 || age > 40){
+      result.innerHTML = '<div class="fail">Usia harus antara 15–40 tahun.</div>'; return;
     }
 
-    const newRef = push(ref(db, 'registrations'));
-    set(newRef, { name, age, reason, tiktok, time: Date.now() });
+    if(!isValidTikTok(tiktok)){
+      result.innerHTML = '<div class="fail">Link TikTok tidak valid.</div>'; return;
+    }
 
-    result.innerHTML = `<div class="success">
-      Pendaftaran diterima.<br><br>
-      Link komunitas resmi:<br>
-      <a href="https://chat.whatsapp.com/DUOPhz2B44v7PPnBMqxScX" target="_blank">Masuk Komunitas IEA</a>
-    </div>`;
+    const snap = await get(ref(db,'registrations'));
+    let used = false;
+    if(snap.exists()){
+      snap.forEach(c=>{ if(c.val().tiktok === tiktok) used = true; });
+    }
+    if(used){ result.innerHTML = '<div class="fail">Akun TikTok ini sudah terdaftar.</div>'; return; }
+
+    const newRef = push(ref(db,'registrations'));
+    await set(newRef,{ name, age, reason, tiktok, time: Date.now() });
+
+    result.innerHTML = '<div class="success">Pendaftaran diterima.<br>Mohon tunggu verifikasi sistem…</div>';
+
+    setTimeout(()=>{
+      result.innerHTML = `<div class="success">Selamat, kamu lolos.<br><a href="https://chat.whatsapp.com/DUOPhz2B44v7PPnBMqxScX" target="_blank">Masuk Grup WhatsApp IEA</a></div>`;
+    },30000);
 
     document.getElementById('name').value='';
     document.getElementById('age').value='';
     document.getElementById('reason').value='';
     document.getElementById('tiktok').value='';
-  };
+  }
 
-  onValue(ref(db,'registrations'), snap=>{
-    const table = document.getElementById('dataTable');
-    table.innerHTML='';
-    snap.forEach(child=>{
-      const d = child.val();
-      table.innerHTML += `<tr>
-        <td>${d.name}</td>
-        <td>${d.age}</td>
-        <td><a href="${d.tiktok}" target="_blank">${d.tiktok}</a></td>
-      </tr>`;
+  onValue(ref(db,'registrations'),snap=>{
+    const table = document.getElementById('dataTable'); table.innerHTML='';
+    snap.forEach(c=>{
+      const d=c.val();
+      table.innerHTML+=`<tr><td>${d.name}</td><td>${d.age}</td><td><a href="${d.tiktok}" target="_blank">${d.tiktok}</a></td></tr>`;
     });
   });
-</script>
-
-<style>
-:root{--bg:#0b0f1a;--card:#11172a;--accent:#4cc9f0;--text:#e5e7eb;--muted:#9ca3af}
-*{box-sizing:border-box}body{margin:0;font-family:'Plus Jakarta Sans',sans-serif;background:radial-gradient(circle at top,#0f172a,#020617);color:var(--text)}header{padding:40px 20px;text-align:center}header h1{font-family:'Orbitron',sans-serif;font-size:28px;letter-spacing:2px;margin-bottom:10px}header p{color:var(--muted);max-width:600px;margin:auto}.container{max-width:1100px;margin:auto;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:30px}@media(max-width:900px){.container{grid-template-columns:1fr}}.card{background:linear-gradient(180deg,#0b1226,#050816);border-radius:16px;padding:24px;box-shadow:0 0 0 1px rgba(255,255,255,0.05)}h2{font-family:'Orbitron',sans-serif;font-size:18px;margin-bottom:16px}label{font-size:14px;color:var(--muted)}input,textarea{width:100%;padding:12px;margin-top:6px;margin-bottom:16px;border-radius:10px;border:none;background:#020617;color:var(--text)}button{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#4cc9f0,#4361ee);color:#020617;font-weight:600;cursor:pointer}table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.06)}th{color:var(--muted);text-align:left}a{color:var(--accent);text-decoration:none}.success{padding:16px;border-radius:12px;background:rgba(76,201,240,0.15);margin-top:16px}.fail{padding:16px;border-radius:12px;background:rgba(239,68,68,0.15);margin-top:16px}
-</style>
-</head>
+</script><style>
+:root{--bg:#020617;--card:#0b1226;--accent:#4cc9f0;--text:#e5e7eb;--muted:#9ca3af}
+body{margin:0;font-family:'Plus Jakarta Sans',sans-serif;background:radial-gradient(circle at top,#0f172a,#020617);color:var(--text)}header{text-align:center;padding:40px 20px}header h1{font-family:'Orbitron',sans-serif;letter-spacing:2px}header p{color:var(--muted)}.container{max-width:1100px;margin:auto;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:30px}@media(max-width:900px){.container{grid-template-columns:1fr}}.card{background:linear-gradient(180deg,#0b1226,#050816);border-radius:18px;padding:26px;box-shadow:0 0 0 1px rgba(255,255,255,0.05)}label{font-size:14px;color:var(--muted)}input,textarea{width:100%;padding:12px;margin-top:6px;margin-bottom:16px;border-radius:12px;border:none;background:#020617;color:var(--text)}button{width:100%;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,#4cc9f0,#4361ee);font-weight:600;cursor:pointer}table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.08)}th{color:var(--muted)}a{color:var(--accent)}.success{background:rgba(76,201,240,0.15);padding:16px;border-radius:12px}.fail{background:rgba(239,68,68,0.15);padding:16px;border-radius:12px}
+</style></head>
 <body>
 <header>
 <h1>INTERNATIONAL EDUCATION ASTRONOMY</h1>
-<p>Form pendaftaran terbuka. Minimal usia 15 tahun. Data pendaftar bersifat publik.</p>
+<p>Pendaftaran terbuka. Data palsu atau bercanda akan dihapus.</p>
 </header>
 <div class="container">
 <div class="card">
-<h2>Pendaftaran Anggota</h2>
-<label>Nama Lengkap</label><input id="name" placeholder="Nama asli" />
-<label>Usia</label><input id="age" type="number" placeholder="Minimal 15" />
-<label>Tujuan Bergabung</label><textarea id="reason" rows="3"></textarea>
-<label>Link TikTok</label><input id="tiktok" placeholder="https://www.tiktok.com/@username" />
-<button onclick="submitForm()">Daftar Sekarang</button>
+<h2>Pendaftaran</h2>
+<label>Nama Lengkap</label><input id="name" />
+<label>Usia</label><input id="age" type="number" />
+<label>Tujuan Bergabung</label><textarea id="reason"></textarea>
+<label>Link TikTok</label><input id="tiktok" />
+<button onclick="submitForm()">Daftar</button>
 <div id="result"></div>
 </div>
 <div class="card">
 <h2>Data Pendaftar Publik</h2>
-<table>
-<thead><tr><th>Nama</th><th>Usia</th><th>TikTok</th></tr></thead>
-<tbody id="dataTable"></tbody>
-</table>
+<table><thead><tr><th>Nama</th><th>Usia</th><th>TikTok</th></tr></thead><tbody id="dataTable"></tbody></table>
 </div>
 </div>
 </body>
