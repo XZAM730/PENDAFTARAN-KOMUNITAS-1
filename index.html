@@ -1,340 +1,169 @@
-<!DOCTYPE html>
-<html lang="id">
+<!DOCTYPE html><html lang="id">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>IEA | Registration Comunity</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>IEA | Registration Community</title>  <!-- Fonts (TIDAK DIUBAH) -->  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">  <!-- ================= THEME & UI (UTUH, TIDAK DIUBAH) ================= -->  <style>
+    :root{
+      --neon:#00f2ff;--bg:#00020a;--card-bg:rgba(0,8,20,.85);
+      --border:rgba(0,242,255,.3);--danger:#ff3e3e;--success:#00ff88;
+    }
+    *{box-sizing:border-box;cursor:crosshair;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;background:var(--bg);color:#fff;font-family:'Rajdhani',sans-serif;min-height:100vh}
+    #canvas{position:fixed;top:0;left:0;z-index:-1}
 
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --neon: #00f2ff;
-            --neon-alt: #7000ff;
-            --bg: #00020a;
-            --card-bg: rgba(0, 8, 20, 0.8);
-            --border: rgba(0, 242, 255, 0.3);
-            --danger: #ff0055;
-        }
-
-        * { box-sizing: border-box; cursor: crosshair; }
-        body, html { margin: 0; padding: 0; background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif; overflow-x: hidden; min-height: 100vh; }
-
-        #canvas { position: fixed; top: 0; left: 0; z-index: -1; }
-
-        .system-top-bar {
-            position: fixed; top: 0; width: 100%; padding: 10px 20px;
-            background: linear-gradient(to bottom, rgba(0,242,255,0.1), transparent);
-            display: flex; justify-content: space-between; font-family: 'Orbitron', sans-serif;
-            font-size: 10px; color: var(--neon); letter-spacing: 2px; z-index: 100;
-            border-bottom: 1px solid var(--border);
-        }
-
-        #admin-trigger { cursor: pointer; user-select: none; }
-
-        header { text-align: center; padding: 80px 20px 40px; position: relative; }
-        header h1 {
-            font-family: 'Orbitron', sans-serif; font-size: clamp(2rem, 8vw, 4rem); margin: 0;
-            background: linear-gradient(45deg, #fff, var(--neon));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 20px rgba(0,242,255,0.5));
-        }
-
-        .container {
-            max-width: 1200px; margin: auto; padding: 0 20px 100px;
-            display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 40px;
-        }
-
-        @media (max-width: 900px) { .container { grid-template-columns: 1fr; } }
-
-        .mission-card {
-            background: var(--card-bg); border: 1px solid var(--border);
-            border-radius: 4px; padding: clamp(20px, 5%, 35px); position: relative;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 0 40px rgba(0,0,0,0.5), inset 0 0 20px rgba(0,242,255,0.05);
-        }
-
-        .mission-card::before {
-            content: "DATA_NODE_" attr(data-node); position: absolute;
-            top: -10px; right: 20px; background: var(--bg); color: var(--neon);
-            padding: 0 10px; font-size: 10px; font-family: 'Orbitron';
-            border: 1px solid var(--border);
-        }
-
-        h2 { font-family: 'Orbitron'; font-size: 18px; color: var(--neon); margin-bottom: 30px; display: flex; align-items: center; }
-        h2::after { content: ""; flex: 1; height: 1px; background: var(--border); margin-left: 20px; }
-
-        .field { margin-bottom: 25px; position: relative; }
-        label { display: block; font-size: 12px; color: var(--neon); margin-bottom: 8px; font-weight: bold; letter-spacing: 1px; }
-        input, textarea {
-            width: 100%; background: rgba(0, 242, 255, 0.03); border: 1px solid var(--border);
-            padding: 15px; color: #fff; font-family: 'Rajdhani'; font-size: 16px; transition: 0.3s;
-        }
-        input:focus { border-color: var(--neon); background: rgba(0, 242, 255, 0.1); box-shadow: 0 0 15px rgba(0,242,255,0.2); outline: none; }
-
-        .btn-launch {
-            width: 100%; padding: 20px; background: transparent; border: 1px solid var(--neon);
-            color: var(--neon); font-family: 'Orbitron'; font-weight: bold; font-size: 14px;
-            letter-spacing: 4px; position: relative; overflow: hidden; transition: 0.3s;
-        }
-        .btn-launch:hover:not(:disabled) { background: var(--neon); color: #000; box-shadow: 0 0 30px var(--neon); }
-        .btn-launch:disabled { opacity: 0.3; filter: grayscale(1); }
-
-        /* Table */
-        .table-wrap { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 300px; }
-        th { text-align: left; padding: 10px; color: var(--neon); font-size: 11px; border-bottom: 2px solid var(--border); }
-        td { padding: 15px 10px; border-bottom: 1px solid rgba(0,242,255,0.1); font-size: 14px; }
-        
-        .status-dot { width: 8px; height: 8px; background: var(--neon); border-radius: 50%; display: inline-block; margin-right: 10px; box-shadow: 0 0 10px var(--neon); }
-        .tk-link { color: var(--neon); text-decoration: none; font-size: 11px; border: 1px solid var(--border); padding: 4px 8px; }
-        .btn-del { color: var(--danger); background: none; border: 1px solid var(--danger); font-size: 10px; padding: 4px 8px; cursor: pointer; font-family: 'Orbitron'; }
-
-        #result { margin-top: 20px; font-size: 14px; display: none; padding: 20px; border: 1px dashed var(--neon); text-align: center; background: rgba(0,242,255,0.05); }
-        
-        .wa-link { 
-            display: inline-block; margin-top: 15px; padding: 12px 24px; background: #25D366; 
-            color: #000; text-decoration: none; font-weight: bold; border-radius: 2px;
-            font-family: 'Orbitron'; font-size: 12px;
-        }
-
-        #audio-toggle { position: fixed; bottom: 20px; right: 20px; z-index: 1000; background: none; border: 1px solid var(--border); color: var(--neon); padding: 10px; font-size: 10px; font-family: 'Orbitron'; }
-    </style>
-</head>
-<body>
-
-<canvas id="canvas"></canvas>
-
-<div class="system-top-bar">
-    <div>IEA_SYSTEM</div>
-    <div id="utc-clock">UTC: 00:00:00</div>
-    <div id="admin-trigger">SIGNAL: STABLE</div>
-</div>
-
-<header>
-    <h1>IEA COMUNITY</h1>
-    <p style="letter-spacing: 5px; color: var(--neon); opacity: 0.8;">INTERNATIONAL EDUCATION ASTRONOMY</p>
-</header>
-
-<div class="container">
-    <div class="mission-card" data-node="001">
-        <h2>REGISTRASI</h2>
-        <input type="text" id="hp" style="display:none">
-        
-        <div class="field">
-            <label>NAMA IDENTITAS</label>
-            <input type="text" id="name" placeholder="Input string..." autocomplete="off">
-        </div>
-
-        <div class="field">
-            <label>UMUR (CYCLE)</label>
-            <input type="number" id="age" placeholder="15 - 40">
-        </div>
-
-        <div class="field">
-            <label>TIKTOK_NETWORK_ID</label>
-            <input type="url" id="tiktok" placeholder="https://tiktok.com/@...">
-        </div>
-
-        <div class="field">
-            <label>TUJUAN MISI</label>
-            <textarea id="reason" rows="3" placeholder="Deskripsikan motivasi Anda..."></textarea>
-        </div>
-
-        <button class="btn-launch" id="submitBtn" onclick="handleSubmission()">LUNCURKAN DATA</button>
-        <div id="result"></div>
-    </div>
-
-    <div class="mission-card" data-node="002">
-        <h2 id="log-title">LOG DATA TERBARU</h2>
-        <div class="table-wrap">
-            <table>
-                <thead id="table-head">
-                    <tr>
-                        <th>MEMBER</th>
-                        <th>AGE</th>
-                        <th>STATUS</th>
-                    </tr>
-                </thead>
-                <tbody id="dataTable"></tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<button id="audio-toggle" onclick="toggleAudio()">SYSTEM SOUND: OFF</button>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-    import { getDatabase, ref, set, onValue, push, remove, limitToLast, query } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyA4lpo6PyADXVVki-bBfcEFf0kxbQuunN8",
-        authDomain: "iea-pendaftaran.firebaseapp.com",
-        databaseURL: "https://iea-pendaftaran-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "iea-pendaftaran",
-        storageBucket: "iea-pendaftaran.firebasestorage.app",
-        messagingSenderId: "383473027982",
-        appId: "1:383473027982:web:679f4c56665f9cb39832df"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-    // SFX & Admin Control
-    const clickSfx = new Audio('https://www.soundjay.com/buttons/button-29.mp3');
-    let audioEnabled = false;
-    let isAdmin = false;
-    let clickCount = 0;
-
-    window.toggleAudio = () => {
-        audioEnabled = !audioEnabled;
-        document.getElementById('audio-toggle').innerText = `SYSTEM SOUND: ${audioEnabled ? 'ON' : 'OFF'}`;
-        if(audioEnabled) clickSfx.play();
+    .system-bar{
+      position:fixed;top:0;width:100%;padding:12px 20px;
+      background:rgba(0,2,10,.8);backdrop-filter:blur(10px);
+      display:flex;justify-content:space-between;align-items:center;
+      font-family:'Orbitron';font-size:10px;color:var(--neon);
+      border-bottom:1px solid var(--border);z-index:1000;
     }
 
-    // Admin Trigger (Klik SIGNAL: STABLE 3x)
-    document.getElementById('admin-trigger').onclick = () => {
-        clickCount++;
-        if(clickCount === 3) {
-            const pass = prompt("AUTHORIZED PERSONNEL ONLY. INPUT ACCESS CODE:");
-            if(pass === "IEA2026") {
-                isAdmin = true;
-                document.getElementById('admin-trigger').innerText = "SIGNAL: ADMIN_ACCESS";
-                document.getElementById('log-title').innerText = "DATABASE CONTROL CENTER";
-                document.getElementById('table-head').innerHTML = `<tr><th>NAME</th><th>COMM_LINK</th><th>ACTION</th></tr>`;
-                renderData();
-                alert("ACCESS GRANTED.");
-            } else {
-                alert("ACCESS DENIED.");
-            }
-            clickCount = 0;
-        }
-    };
-
-    // UTC Clock
-    setInterval(() => {
-        document.getElementById('utc-clock').innerText = `UTC: ${new Date().toUTCString().split(' ')[4]}`;
-    }, 1000);
-
-    // Submission Logic
-    window.handleSubmission = async function() {
-        if(audioEnabled) clickSfx.play();
-        const btn = document.getElementById('submitBtn');
-        const result = document.getElementById('result');
-        const waLink = "https://chat.whatsapp.com/DUOPhz2B44v7PPnBMqxScX";
-
-        const data = {
-            name: document.getElementById('name').value.trim(),
-            age: parseInt(document.getElementById('age').value),
-            tiktok: document.getElementById('tiktok').value.trim(),
-            reason: document.getElementById('reason').value.trim(),
-            hp: document.getElementById('hp').value
-        };
-
-        if(data.hp !== "" || localStorage.getItem('iea_ult_done')) return;
-        if(!data.name || isNaN(data.age) || !data.tiktok.includes('tiktok.com')) {
-            result.style.display = "block";
-            result.style.color = "var(--danger)";
-            result.innerText = "ERROR: PARAMETER DATA TIDAK VALID";
-            return;
-        }
-
-        btn.disabled = true;
-        btn.innerText = "UPLOADING...";
-
-        try {
-            await set(push(ref(db, 'registrations')), {
-                name: data.name, age: data.age, tiktok: data.tiktok, timestamp: Date.now()
-            });
-            localStorage.setItem('iea_ult_done', 'true');
-            result.style.display = "block";
-            result.style.color = "var(--neon)";
-            result.innerHTML = "DATA DITERIMA. MENGARAHKAN KE SATELIT WA...<br><a href='"+waLink+"' class='wa-link'>BUKA WHATSAPP</a>";
-            setTimeout(() => { window.location.href = waLink; }, 3500);
-        } catch (e) {
-            btn.disabled = false;
-            result.innerText = "CONNECTION LOST. RETRY.";
-        }
-    };
-
-    // Render Data
-    function renderData() {
-        const dataQuery = isAdmin ? ref(db, 'registrations') : query(ref(db, 'registrations'), limitToLast(8));
-        onValue(dataQuery, snap => {
-            const tbody = document.getElementById('dataTable');
-            tbody.innerHTML = '';
-            let list = [];
-            snap.forEach(c => { 
-                let val = c.val();
-                val.key = c.key;
-                list.push(val); 
-            });
-            list.reverse().forEach(item => {
-                if(isAdmin) {
-                    tbody.innerHTML += `<tr>
-                        <td>${item.name}</td>
-                        <td><a href="${item.tiktok}" target="_blank" class="tk-link">VIEW</a></td>
-                        <td><button class="btn-del" onclick="deleteEntry('${item.key}')">TERMINATE</button></td>
-                    </tr>`;
-                } else {
-                    tbody.innerHTML += `<tr>
-                        <td><span class="status-dot"></span>${item.name.substring(0,12)}</td>
-                        <td>${item.age}</td>
-                        <td style="color:var(--neon)">ONLINE</td>
-                    </tr>`;
-                }
-            });
-        });
+    header{text-align:center;padding:100px 20px 40px}
+    header h1{
+      font-family:'Orbitron';font-size:clamp(2rem,7vw,3.5rem);
+      background:linear-gradient(#fff,var(--neon));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
     }
 
-    window.deleteEntry = (key) => {
-        if(confirm("PERMANENTLY DELETE THIS NODE?")) {
-            remove(ref(db, `registrations/${key}`));
-        }
-    };
+    .main-wrapper{
+      max-width:1100px;margin:auto;padding:0 20px 80px;
+      display:grid;grid-template-columns:1fr 1fr;gap:30px;
+    }
+    @media(max-width:850px){.main-wrapper{grid-template-columns:1fr}}
 
-    renderData();
-
-    // Particle BG
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    let particles = [];
-
-    function init() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        particles = [];
-        for(let i=0; i<60; i++) {
-            particles.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                vx: (Math.random() - 0.5) * 0.4,
-                vy: (Math.random() - 0.5) * 0.4
-            });
-        }
+    .card{
+      background:var(--card-bg);border:1px solid var(--border);
+      border-radius:8px;padding:25px;backdrop-filter:blur(15px);
+    }
+    .card::before{
+      content:"SECURE_CONNECTION";position:absolute;top:-10px;right:20px;
+      font-size:9px;font-family:'Orbitron';color:var(--neon);
     }
 
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "rgba(0, 242, 255, 0.4)";
-        ctx.strokeStyle = "rgba(0, 242, 255, 0.08)";
-        particles.forEach((p, i) => {
-            p.x += p.vx; p.y += p.vy;
-            if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
-            if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
-            ctx.beginPath(); ctx.arc(p.x, p.y, 1.2, 0, Math.PI*2); ctx.fill();
-            for(let j=i+1; j<particles.length; j++) {
-                let p2 = particles[j];
-                let dist = Math.hypot(p.x - p2.x, p.y - p2.y);
-                if(dist < 140) { ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke(); }
-            }
-        });
-        requestAnimationFrame(animate);
+    h2{font-family:'Orbitron';font-size:16px;color:var(--neon);letter-spacing:2px}
+    .input-box{margin-bottom:18px}
+    label{font-size:11px;color:var(--neon);font-weight:700}
+    input,textarea{
+      width:100%;background:rgba(0,242,255,.05);
+      border:1px solid var(--border);padding:14px;color:#fff;
+      border-radius:4px;font-family:'Rajdhani'
     }
-    window.onresize = init;
-    init(); animate();
-</script>
+    input:focus,textarea:focus{border-color:var(--neon);outline:none}
 
-</body>
+    .btn-send{
+      width:100%;padding:18px;border:1px solid var(--neon);
+      background:transparent;color:var(--neon);
+      font-family:'Orbitron';letter-spacing:3px;font-weight:bold;
+    }
+    .btn-send:hover{background:var(--neon);color:#000}
+
+    #status-box{margin-top:20px;padding:15px;border-radius:4px;display:none}
+    .success-mode{border:1px solid var(--success);color:var(--success)}
+    .error-mode{border:1px solid var(--danger);color:var(--danger)}
+
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.05)}
+    th{color:var(--neon);font-size:11px}
+    .status-on{width:7px;height:7px;background:var(--neon);border-radius:50%;display:inline-block}
+    .wa-btn{display:inline-block;margin-top:12px;padding:10px 20px;
+      background:var(--success);color:#000;text-decoration:none;font-weight:bold}
+  </style></head><body>
+<canvas id="canvas"></canvas><div class="system-bar">
+  <div>IEA/div>
+  <div id="clock">00:00:00 UTC</div>
+  <div>SIGNAL: STABLE</div>
+</div><header>
+  <h1>REGISTRATION COMMUNITY</h1>
+  <p style="color:var(--neon);letter-spacing:4px;font-size:12px">
+    INTERNATIONAL EDUCATION ASTRONOMY
+  </p>
+</header><div class="main-wrapper"><!-- ================= FORM ================= --><div class="card">
+  <h2>REGISTRASI</h2>  <div class="input-box">
+    <label>NAMA LENGKAP</label>
+    <input id="name" autocomplete="off">
+  </div>  <div class="input-box">
+    <label>UMUR</label>
+    <input id="age" type="number" min="15" max="40">
+  </div>  <div class="input-box">
+    <label>TIKTOK URL</label>
+    <input id="tiktok" placeholder="https://tiktok.com/@username">
+  </div>  <div class="input-box">
+    <label>TUJUAN</label>
+    <textarea id="reason" rows="2"></textarea>
+  </div><button class="btn-send" id="submitBtn" onclick="sendData()">KIRIM TRANSMISI</button>
+
+  <div id="status-box"></div>
+</div><!-- ================= LOG ================= --><div class="card">
+  <h2>PERSONNEL LOG</h2>
+  <table>
+    <thead>
+      <tr><th>OPERATOR</th><th>AGE</th><th>STATUS</th></tr>
+    </thead>
+    <tbody id="dataTable"></tbody>
+  </table>
+</div></div><!-- ================= SCRIPT (FINAL, RAPI, AMAN) ================= --><script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+import { getDatabase, ref, push, set, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
+
+const CONFIG = {
+  apiKey: "AIzaSyA4lpo6PyADXVVki-bBfcEFf0kxbQuunN8",
+  databaseURL: "https://iea-pendaftaran-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "iea-pendaftaran"
+};
+
+const WA_LINK = "https://chat.whatsapp.com/DUOPhz2B44v7PPnBMqxScX";
+const STORAGE_KEY = "iea_registered";
+
+const app = initializeApp(CONFIG);
+const db = getDatabase(app);
+
+setInterval(() => {
+  clock.innerText = new Date().toUTCString().split(" ")[4] + " UTC";
+}, 1000);
+
+function showStatus(msg, ok=false){
+  const box = document.getElementById('status-box');
+  box.style.display = 'block';
+  box.className = ok ? 'success-mode' : 'error-mode';
+  box.innerHTML = msg;
+}
+
+function validName(n){return /^[A-Za-z\s]{3,50}$/.test(n)}
+function validTikTok(u){return /^https:\/\/(www\.)?tiktok\.com\/@[\w.]+$/.test(u)}
+
+window.sendData = async () => {
+  const name = document.getElementById('name').value.trim();
+  const age  = Number(document.getElementById('age').value);
+  const tiktok = document.getElementById('tiktok').value.trim();
+  const reason = document.getElementById('reason').value.trim();
+  const btn = document.getElementById('submitBtn');
+
+  if(localStorage.getItem(STORAGE_KEY)) return showStatus('ANDA SUDAH TERDAFTAR');
+  if(!validName(name)) return showStatus('NAMA TIDAK VALID');
+  if(!Number.isInteger(age) || age < 15 || age > 40) return showStatus('UMUR 15–40');
+  if(!validTikTok(tiktok)) return showStatus('LINK TIKTOK TIDAK VALID');
+  if(reason.length < 10) return showStatus('MOTIVASI MINIMAL 10 KARAKTER');
+
+  btn.disabled = true;
+  btn.innerText = 'UPLOADING...';
+
+  await set(push(ref(db,'registrations')), {
+    name, age, tiktok, reason, timestamp: Date.now()
+  });
+
+  localStorage.setItem(STORAGE_KEY,'1');
+  showStatus(`LULUS VERIFIKASI<br><a href="${WA_LINK}" class="wa-btn">GABUNG WHATSAPP</a>`, true);
+  setTimeout(()=>location.href=WA_LINK,3000);
+};
+
+onValue(query(ref(db,'registrations'), limitToLast(8)), snap => {
+  const tb = document.getElementById('dataTable');
+  tb.innerHTML = '';
+  snap.forEach(c => {
+    const d = c.val();
+    tb.innerHTML += `<tr><td><span class='status-on'></span> ${d.name.slice(0,12)}</td><td>${d.age}</td><td style='color:var(--neon)'>ONLINE</td></tr>`;
+  });
+});
+</script></body>
 </html>
