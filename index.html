@@ -1,169 +1,316 @@
-<!DOCTYPE html><html lang="id">
+<!DOCTYPE html>
+<html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>IEA | Registration Community</title>  <!-- Fonts (TIDAK DIUBAH) -->  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">  <!-- ================= THEME & UI (UTUH, TIDAK DIUBAH) ================= -->  <style>
-    :root{
-      --neon:#00f2ff;--bg:#00020a;--card-bg:rgba(0,8,20,.85);
-      --border:rgba(0,242,255,.3);--danger:#ff3e3e;--success:#00ff88;
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>IEA | Registration Community</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --neon: #00f2ff;
+            --bg: #00020a;
+            --card-bg: rgba(0, 8, 20, 0.85);
+            --border: rgba(0, 242, 255, 0.3);
+            --danger: #ff3e3e;
+            --success: #00ff88;
+        }
+
+        * { box-sizing: border-box; cursor: crosshair; -webkit-tap-highlight-color: transparent; }
+        body, html { margin: 0; padding: 0; background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif; overflow-x: hidden; min-height: 100vh; }
+
+        #canvas { position: fixed; top: 0; left: 0; z-index: -1; pointer-events: none; }
+
+        /* Navigation */
+        .system-bar {
+            position: fixed; top: 0; width: 100%; padding: 12px 20px;
+            background: rgba(0, 2, 10, 0.8); backdrop-filter: blur(10px);
+            display: flex; justify-content: space-between; align-items: center;
+            font-family: 'Orbitron', sans-serif; font-size: 10px; color: var(--neon);
+            border-bottom: 1px solid var(--border); z-index: 1000;
+        }
+
+        #admin-gate { cursor: pointer; padding: 4px 8px; border: 1px solid transparent; border-radius: 4px; }
+        #admin-gate:active { border-color: var(--neon); }
+
+        header { text-align: center; padding: 100px 20px 40px; }
+        header h1 {
+            font-family: 'Orbitron', sans-serif; font-size: clamp(2rem, 7vw, 3.5rem); margin: 0;
+            background: linear-gradient(to bottom, #fff, var(--neon));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0,242,255,0.3);
+        }
+
+        /* Layout Grid */
+        .main-wrapper {
+            max-width: 1100px; margin: auto; padding: 0 20px 80px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 30px;
+        }
+        @media (max-width: 850px) { .main-wrapper { grid-template-columns: 1fr; } }
+
+        .card {
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: 8px; padding: 25px; position: relative;
+            backdrop-filter: blur(15px);
+        }
+        .card::before {
+            content: "SECURE_CONNECTION"; position: absolute; top: -10px; right: 20px;
+            background: var(--bg); color: var(--neon); font-size: 9px; 
+            padding: 2px 8px; border: 1px solid var(--border); font-family: 'Orbitron';
+        }
+
+        h2 { font-family: 'Orbitron'; font-size: 16px; color: var(--neon); margin-bottom: 25px; letter-spacing: 2px; }
+
+        /* Input Styles */
+        .input-box { margin-bottom: 20px; }
+        label { display: block; font-size: 11px; color: var(--neon); margin-bottom: 6px; font-weight: 700; opacity: 0.8; }
+        input, textarea {
+            width: 100%; background: rgba(0, 242, 255, 0.05); border: 1px solid var(--border);
+            padding: 14px; color: #fff; font-family: 'Rajdhani'; font-size: 15px; border-radius: 4px;
+        }
+        input:focus { border-color: var(--neon); outline: none; background: rgba(0, 242, 255, 0.1); }
+
+        .btn-send {
+            width: 100%; padding: 18px; background: transparent; border: 1px solid var(--neon);
+            color: var(--neon); font-family: 'Orbitron'; font-weight: bold; font-size: 13px;
+            letter-spacing: 3px; cursor: pointer; transition: 0.3s;
+        }
+        .btn-send:hover { background: var(--neon); color: #000; box-shadow: 0 0 25px var(--neon); }
+        .btn-send:disabled { opacity: 0.4; cursor: wait; }
+
+        /* Status Message */
+        #status-box { 
+            margin-top: 20px; padding: 15px; border-radius: 4px; display: none; 
+            font-size: 13px; text-align: center; border: 1px solid;
+        }
+        .success-mode { border-color: var(--success); color: var(--success); background: rgba(0,255,136,0.05); }
+        .error-mode { border-color: var(--danger); color: var(--danger); background: rgba(255,62,62,0.05); }
+
+        /* Table */
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; padding: 10px; color: var(--neon); font-size: 11px; border-bottom: 1px solid var(--border); }
+        td { padding: 14px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
+        
+        .status-on { width: 7px; height: 7px; background: var(--neon); border-radius: 50%; display: inline-block; margin-right: 8px; box-shadow: 0 0 8px var(--neon); }
+        .del-btn { color: var(--danger); background: none; border: 1px solid var(--danger); padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-family: 'Orbitron'; }
+        
+        .wa-btn {
+            display: inline-block; margin-top: 10px; padding: 10px 20px; background: var(--success);
+            color: #000; text-decoration: none; font-weight: bold; border-radius: 4px; font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div class="system-bar">
+    <div>IEA_LOG_v4.2</div>
+    <div id="clock">00:00:00 UTC</div>
+    <div id="admin-gate">SIGNAL: STABLE</div>
+</div>
+
+<header>
+    <h1>REGISTRATION</h1>
+    <p style="color: var(--neon); letter-spacing: 4px; font-size: 12px; margin-top: 10px;">INTERNATIONAL EDUCATION ASTRONOMY</p>
+</header>
+
+<div class="main-wrapper">
+    <div class="card" data-node="001">
+        <h2>ISI DATA</h2>
+        <input type="text" id="hp" style="display:none">
+        
+        <div class="input-box">
+            <label>NAMA LENGKAP</label>
+            <input type="text" id="name" placeholder="Input operator name..." autocomplete="off">
+        </div>
+
+        <div class="input-box">
+            <label>UMUR</label>
+            <input type="number" id="age" placeholder="Contoh: 18">
+        </div>
+
+        <div class="input-box">
+            <label>TIKTOK URL</label>
+            <input type="url" id="tiktok" placeholder="https://tiktok.com/@...">
+        </div>
+
+        <div class="input-box">
+            <label>TUJUAN SINGKAT</label>
+            <textarea id="reason" rows="2" placeholder="Tuliskan alasan anda bergabung..."></textarea>
+        </div>
+
+        <button class="btn-send" id="submitBtn" onclick="sendData()">KIRIM TRANSMISI</button>
+        <div id="status-box"></div>
+    </div>
+
+    <div class="card" data-node="002">
+        <h2 id="log-title">PERSONNEL LOG</h2>
+        <div class="table-container">
+            <table>
+                <thead id="table-head">
+                    <tr>
+                        <th>OPERATOR</th>
+                        <th>AGE</th>
+                        <th>STATUS</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTable"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+    import { getDatabase, ref, set, onValue, push, remove, limitToLast, query } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyA4lpo6PyADXVVki-bBfcEFf0kxbQuunN8",
+        authDomain: "iea-pendaftaran.firebaseapp.com",
+        databaseURL: "https://iea-pendaftaran-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "iea-pendaftaran"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // --- Time System ---
+    setInterval(() => {
+        document.getElementById('clock').innerText = new Date().toUTCString().split(' ')[4] + ' UTC';
+    }, 1000);
+
+    // --- Admin Hidden Access ---
+    let isAdmin = false;
+    let clickCount = 0;
+    document.getElementById('admin-gate').onclick = () => {
+        clickCount++;
+        if(clickCount === 3) {
+            const code = prompt("INPUT ACCESS KODE:");
+            if(code === "IEA2026") {
+                isAdmin = true;
+                document.getElementById('admin-gate').innerText = "SIGNAL: ADMIN_ON";
+                document.getElementById('log-title').innerText = "DATABASE MASTER";
+                document.getElementById('table-head').innerHTML = `<tr><th>NAME</th><th>LINK</th><th>ACTION</th></tr>`;
+                renderLogs();
+            }
+            clickCount = 0;
+        }
+    };
+
+    // --- Submission Function ---
+    window.sendData = async function() {
+        const btn = document.getElementById('submitBtn');
+        const status = document.getElementById('status-box');
+        const waLink = "https://chat.whatsapp.com/DUOPhz2B44v7PPnBMqxScX";
+        
+        const name = document.getElementById('name').value.trim();
+        const age = document.getElementById('age').value;
+        const tiktok = document.getElementById('tiktok').value.trim();
+        const reason = document.getElementById('reason').value.trim();
+        
+        // Anti Spam & Validation
+        if(localStorage.getItem('iea_done')) {
+            showStatus("ANDA SUDAH TERDAFTAR.", "error");
+            return;
+        }
+        if(!name || !age || !tiktok.includes('tiktok.com')) {
+            showStatus("DATA TIDAK VALID / LINK TIKTOK SALAH.", "error");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "UPLOADING...";
+        showStatus("MENYAMBUNGKAN KE SATELIT...", "success");
+
+        try {
+            const newRef = push(ref(db, 'registrations'));
+            await set(newRef, {
+                name, age, tiktok, reason, timestamp: Date.now()
+            });
+            
+            localStorage.setItem('iea_done', 'true');
+            showStatus("TRANSMISI BERHASIL! MENGARAHKAN KE GRUP...", "success");
+            status.innerHTML += `<br><a href="${waLink}" class="wa-btn">GABUNG WHATSAPP</a>`;
+            setTimeout(() => { window.location.href = waLink; }, 3000);
+            
+        } catch (e) {
+            btn.disabled = false;
+            btn.innerText = "KIRIM TRANSMISI";
+            showStatus("GAGAL: PERIKSA KONEKSI/FIREBASE RULES.", "error");
+            console.error(e);
+        }
+    };
+
+    function showStatus(txt, type) {
+        const box = document.getElementById('status-box');
+        box.style.display = "block";
+        box.className = type === "success" ? "success-mode" : "error-mode";
+        box.innerText = txt;
     }
-    *{box-sizing:border-box;cursor:crosshair;-webkit-tap-highlight-color:transparent}
-    html,body{margin:0;background:var(--bg);color:#fff;font-family:'Rajdhani',sans-serif;min-height:100vh}
-    #canvas{position:fixed;top:0;left:0;z-index:-1}
 
-    .system-bar{
-      position:fixed;top:0;width:100%;padding:12px 20px;
-      background:rgba(0,2,10,.8);backdrop-filter:blur(10px);
-      display:flex;justify-content:space-between;align-items:center;
-      font-family:'Orbitron';font-size:10px;color:var(--neon);
-      border-bottom:1px solid var(--border);z-index:1000;
+    // --- Render Table ---
+    function renderLogs() {
+        const q = isAdmin ? ref(db, 'registrations') : query(ref(db, 'registrations'), limitToLast(8));
+        onValue(q, (snap) => {
+            const tbody = document.getElementById('dataTable');
+            tbody.innerHTML = '';
+            let data = [];
+            snap.forEach(c => { 
+                let item = c.val(); 
+                item.key = c.key; 
+                data.push(item); 
+            });
+            data.reverse().forEach(p => {
+                if(isAdmin) {
+                    tbody.innerHTML += `<tr>
+                        <td>${p.name}</td>
+                        <td><a href="${p.tiktok}" target="_blank" style="color:var(--neon)">OPEN</a></td>
+                        <td><button class="del-btn" onclick="deleteData('${p.key}')">DEL</button></td>
+                    </tr>`;
+                } else {
+                    tbody.innerHTML += `<tr>
+                        <td><span class="status-on"></span>${p.name.substring(0,12)}</td>
+                        <td>${p.age}</td>
+                        <td style="color:var(--neon)">ONLINE</td>
+                    </tr>`;
+                }
+            });
+        });
     }
 
-    header{text-align:center;padding:100px 20px 40px}
-    header h1{
-      font-family:'Orbitron';font-size:clamp(2rem,7vw,3.5rem);
-      background:linear-gradient(#fff,var(--neon));
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    window.deleteData = (key) => {
+        if(confirm("HAPUS DATA INI?")) remove(ref(db, `registrations/${key}`));
+    };
+
+    renderLogs();
+
+    // --- Background Animation ---
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let pts = [];
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    function init() {
+        pts = [];
+        for(let i=0; i<50; i++) pts.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, vx:Math.random()-0.5, vy:Math.random()-0.5});
     }
-
-    .main-wrapper{
-      max-width:1100px;margin:auto;padding:0 20px 80px;
-      display:grid;grid-template-columns:1fr 1fr;gap:30px;
+    function loop() {
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        ctx.fillStyle = "rgba(0, 242, 255, 0.3)";
+        ctx.strokeStyle = "rgba(0, 242, 255, 0.05)";
+        pts.forEach(p => {
+            p.x += p.vx * 0.5; p.y += p.vy * 0.5;
+            if(p.x<0 || p.x>canvas.width) p.vx*=-1;
+            if(p.y<0 || p.y>canvas.height) p.vy*=-1;
+            ctx.beginPath(); ctx.arc(p.x, p.y, 1, 0, Math.PI*2); ctx.fill();
+        });
+        requestAnimationFrame(loop);
     }
-    @media(max-width:850px){.main-wrapper{grid-template-columns:1fr}}
+    window.onresize = resize;
+    resize(); init(); loop();
+</script>
 
-    .card{
-      background:var(--card-bg);border:1px solid var(--border);
-      border-radius:8px;padding:25px;backdrop-filter:blur(15px);
-    }
-    .card::before{
-      content:"SECURE_CONNECTION";position:absolute;top:-10px;right:20px;
-      font-size:9px;font-family:'Orbitron';color:var(--neon);
-    }
-
-    h2{font-family:'Orbitron';font-size:16px;color:var(--neon);letter-spacing:2px}
-    .input-box{margin-bottom:18px}
-    label{font-size:11px;color:var(--neon);font-weight:700}
-    input,textarea{
-      width:100%;background:rgba(0,242,255,.05);
-      border:1px solid var(--border);padding:14px;color:#fff;
-      border-radius:4px;font-family:'Rajdhani'
-    }
-    input:focus,textarea:focus{border-color:var(--neon);outline:none}
-
-    .btn-send{
-      width:100%;padding:18px;border:1px solid var(--neon);
-      background:transparent;color:var(--neon);
-      font-family:'Orbitron';letter-spacing:3px;font-weight:bold;
-    }
-    .btn-send:hover{background:var(--neon);color:#000}
-
-    #status-box{margin-top:20px;padding:15px;border-radius:4px;display:none}
-    .success-mode{border:1px solid var(--success);color:var(--success)}
-    .error-mode{border:1px solid var(--danger);color:var(--danger)}
-
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.05)}
-    th{color:var(--neon);font-size:11px}
-    .status-on{width:7px;height:7px;background:var(--neon);border-radius:50%;display:inline-block}
-    .wa-btn{display:inline-block;margin-top:12px;padding:10px 20px;
-      background:var(--success);color:#000;text-decoration:none;font-weight:bold}
-  </style></head><body>
-<canvas id="canvas"></canvas><div class="system-bar">
-  <div>IEA/div>
-  <div id="clock">00:00:00 UTC</div>
-  <div>SIGNAL: STABLE</div>
-</div><header>
-  <h1>REGISTRATION COMMUNITY</h1>
-  <p style="color:var(--neon);letter-spacing:4px;font-size:12px">
-    INTERNATIONAL EDUCATION ASTRONOMY
-  </p>
-</header><div class="main-wrapper"><!-- ================= FORM ================= --><div class="card">
-  <h2>REGISTRASI</h2>  <div class="input-box">
-    <label>NAMA LENGKAP</label>
-    <input id="name" autocomplete="off">
-  </div>  <div class="input-box">
-    <label>UMUR</label>
-    <input id="age" type="number" min="15" max="40">
-  </div>  <div class="input-box">
-    <label>TIKTOK URL</label>
-    <input id="tiktok" placeholder="https://tiktok.com/@username">
-  </div>  <div class="input-box">
-    <label>TUJUAN</label>
-    <textarea id="reason" rows="2"></textarea>
-  </div><button class="btn-send" id="submitBtn" onclick="sendData()">KIRIM TRANSMISI</button>
-
-  <div id="status-box"></div>
-</div><!-- ================= LOG ================= --><div class="card">
-  <h2>PERSONNEL LOG</h2>
-  <table>
-    <thead>
-      <tr><th>OPERATOR</th><th>AGE</th><th>STATUS</th></tr>
-    </thead>
-    <tbody id="dataTable"></tbody>
-  </table>
-</div></div><!-- ================= SCRIPT (FINAL, RAPI, AMAN) ================= --><script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-import { getDatabase, ref, push, set, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
-
-const CONFIG = {
-  apiKey: "AIzaSyA4lpo6PyADXVVki-bBfcEFf0kxbQuunN8",
-  databaseURL: "https://iea-pendaftaran-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "iea-pendaftaran"
-};
-
-const WA_LINK = "https://chat.whatsapp.com/DUOPhz2B44v7PPnBMqxScX";
-const STORAGE_KEY = "iea_registered";
-
-const app = initializeApp(CONFIG);
-const db = getDatabase(app);
-
-setInterval(() => {
-  clock.innerText = new Date().toUTCString().split(" ")[4] + " UTC";
-}, 1000);
-
-function showStatus(msg, ok=false){
-  const box = document.getElementById('status-box');
-  box.style.display = 'block';
-  box.className = ok ? 'success-mode' : 'error-mode';
-  box.innerHTML = msg;
-}
-
-function validName(n){return /^[A-Za-z\s]{3,50}$/.test(n)}
-function validTikTok(u){return /^https:\/\/(www\.)?tiktok\.com\/@[\w.]+$/.test(u)}
-
-window.sendData = async () => {
-  const name = document.getElementById('name').value.trim();
-  const age  = Number(document.getElementById('age').value);
-  const tiktok = document.getElementById('tiktok').value.trim();
-  const reason = document.getElementById('reason').value.trim();
-  const btn = document.getElementById('submitBtn');
-
-  if(localStorage.getItem(STORAGE_KEY)) return showStatus('ANDA SUDAH TERDAFTAR');
-  if(!validName(name)) return showStatus('NAMA TIDAK VALID');
-  if(!Number.isInteger(age) || age < 15 || age > 40) return showStatus('UMUR 15–40');
-  if(!validTikTok(tiktok)) return showStatus('LINK TIKTOK TIDAK VALID');
-  if(reason.length < 10) return showStatus('MOTIVASI MINIMAL 10 KARAKTER');
-
-  btn.disabled = true;
-  btn.innerText = 'UPLOADING...';
-
-  await set(push(ref(db,'registrations')), {
-    name, age, tiktok, reason, timestamp: Date.now()
-  });
-
-  localStorage.setItem(STORAGE_KEY,'1');
-  showStatus(`LULUS VERIFIKASI<br><a href="${WA_LINK}" class="wa-btn">GABUNG WHATSAPP</a>`, true);
-  setTimeout(()=>location.href=WA_LINK,3000);
-};
-
-onValue(query(ref(db,'registrations'), limitToLast(8)), snap => {
-  const tb = document.getElementById('dataTable');
-  tb.innerHTML = '';
-  snap.forEach(c => {
-    const d = c.val();
-    tb.innerHTML += `<tr><td><span class='status-on'></span> ${d.name.slice(0,12)}</td><td>${d.age}</td><td style='color:var(--neon)'>ONLINE</td></tr>`;
-  });
-});
-</script></body>
+</body>
 </html>
