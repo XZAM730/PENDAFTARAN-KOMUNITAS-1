@@ -1,1 +1,246 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>IEA | Pendaftaran Komunitas 2</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
+    <style>
+        :root {
+            /* TEMA UNGU NEBULA UNTUK GRUP 2 */
+            --neon: #bc13fe; --bg: #05000a; --card-bg: rgba(15, 0, 30, 0.9);
+            --border: rgba(188, 19, 254, 0.3); --success: #00ff88; --danger: #ff3e3e;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body { margin: 0; background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif; overflow-x: hidden; }
+        #canvas { position: fixed; top: 0; left: 0; z-index: -1; pointer-events: none; }
+
+        .system-bar { 
+            position: fixed; top: 0; width: 100%; padding: 10px 15px; 
+            background: rgba(0,0,0,0.95); display: flex; justify-content: space-between; 
+            font-family: 'Orbitron'; font-size: 10px; color: var(--neon); 
+            border-bottom: 1px solid var(--border); z-index: 1000;
+        }
+        .admin-btn { cursor: pointer; border: 1px solid var(--neon); padding: 2px 8px; border-radius: 3px; }
+
+        header { text-align: center; padding: 80px 20px 30px; }
+        h1 { font-family: 'Orbitron'; font-size: clamp(1.8rem, 8vw, 3rem); margin: 0; text-shadow: 0 0 15px var(--neon); color: #fff; }
+
+        .container { max-width: 1200px; margin: auto; padding: 0 15px 100px; display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; }
+        @media (max-width: 900px) { .container { grid-template-columns: 1fr; } }
+
+        .card { background: var(--card-bg); border: 1px solid var(--border); padding: 25px; border-radius: 8px; backdrop-filter: blur(10px); }
+        h2 { font-family: 'Orbitron'; font-size: 13px; color: var(--neon); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
+
+        .input-group { margin-bottom: 15px; position: relative; }
+        label { display: block; font-size: 11px; color: var(--neon); margin-bottom: 5px; font-weight: bold; text-transform: uppercase; }
+        
+        input, textarea { 
+            width: 100%; background: rgba(188,19,254,0.05); border: 1px solid var(--border); 
+            padding: 14px; color: #fff; font-family: 'Rajdhani'; font-size: 16px; border-radius: 4px;
+        }
+
+        input.invalid { border-color: var(--danger); }
+        input.valid { border-color: var(--success); }
+
+        .hint { font-size: 10px; margin-top: 4px; display: block; color: rgba(255,255,255,0.5); }
+        .hint.error { color: var(--danger); }
+
+        .btn { 
+            width: 100%; padding: 18px; background: transparent; border: 1px solid var(--neon); 
+            color: var(--neon); font-family: 'Orbitron'; font-weight: bold; cursor: pointer; 
+            transition: 0.3s; font-size: 12px; margin-top: 10px;
+        }
+        .btn:hover:not(:disabled) { background: var(--neon); color: #000; box-shadow: 0 0 20px var(--neon); }
+        .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        #cv-result { display: none; text-align: center; }
+        #id-card { 
+            width: 100%; max-width: 340px; height: 200px; margin: 0 auto 20px; 
+            background: linear-gradient(135deg, #0a001a 0%, #1a0033 100%); 
+            border: 2px solid var(--neon); border-radius: 12px; padding: 20px; 
+            text-align: left; position: relative; overflow: hidden;
+        }
+
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 400px; }
+        th { text-align: left; color: var(--neon); font-family: 'Orbitron'; font-size: 9px; padding: 12px; border-bottom: 2px solid var(--border); }
+        td { padding: 12px; border-bottom: 1px solid rgba(188,19,254,0.1); font-size: 14px; }
+        .del-btn { background: none; border: 1px solid var(--danger); color: var(--danger); font-family: 'Orbitron'; font-size: 8px; padding: 5px 10px; cursor: pointer; border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+<div class="system-bar">
+    <div>IEA // DIVISI 2</div>
+    <div id="clock">00:00:00 WIB</div>
+    <div id="loginBtn" class="admin-btn" onclick="adminLogin()">LOGIN</div>
+</div>
+
+<header>
+    <h1>IEA REGISTRASI 2</h1>
+    <p style="color:var(--neon); font-size:10px; letter-spacing:4px;">KOMUNITAS ASTRONOMI - GRUP 2</p>
+</header>
+
+<div class="container">
+    <div class="card">
+        <h2>IDENTIFIKASI ANGGOTA</h2>
+        <div id="form-box">
+            <div class="input-group">
+                <label>Nama Lengkap</label>
+                <input type="text" id="name" placeholder="Nama anda..." maxlength="30">
+                <span class="hint" id="name-hint">Min. 3 huruf, tanpa angka.</span>
+            </div>
+            <div class="input-group">
+                <label>Tanggal Lahir</label>
+                <input type="date" id="birthdate">
+                <span class="hint" id="age-hint">Syarat usia: 15 - 40 tahun.</span>
+            </div>
+            <div class="input-group">
+                <label>Link Profil TikTok</label>
+                <input type="url" id="tiktok" placeholder="tiktok.com/@username">
+            </div>
+            <div class="input-group">
+                <label>Alasan Bergabung</label>
+                <textarea id="reason" rows="2" placeholder="Tulis alasan singkat..."></textarea>
+            </div>
+            <button class="btn" id="submitBtn" onclick="submitData()" disabled>KIRIM DATA GRUP 2</button>
+        </div>
+
+        <div id="cv-result">
+            <div id="id-card">
+                <div style="font-family:'Orbitron'; font-size:9px; color:var(--neon); border-bottom:1px solid var(--border); padding-bottom:5px; margin-bottom:15px;">ID ANGGOTA DIVISI 2 // 2026</div>
+                <div style="font-family:'Orbitron'; font-size:18px; color:#fff; text-transform:uppercase;" id="c-name">NAMA</div>
+                <div style="font-size:12px; color:var(--neon); margin-top:5px;" id="c-bday">TGL LAHIR: -</div>
+                <div style="font-size:12px; color:var(--neon);" id="c-tiktok">TIKTOK: -</div>
+                <div style="margin-top:30px; color:var(--success); font-family:'Orbitron'; font-size:10px; letter-spacing:2px;">STATUS: TERVERIFIKASI</div>
+                <div style="position:absolute; bottom:10px; right:15px; opacity:0.1; font-family:'Orbitron'; font-size:40px; font-weight:bold;">IEA</div>
+            </div>
+            <button class="btn" style="background:var(--success); color:#000;" onclick="saveCard()">UNDUH PNG</button>
+            <a href="GANTI_DENGAN_LINK_WA_GRUP_2" class="btn" style="display:block; text-decoration:none; text-align:center;">GABUNG GRUP 2</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>LOG AKTIVITAS GRUP 2</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr id="table-head">
+                        <th>OPERATOR</th>
+                        <th>USIA</th>
+                        <th>STATUS</th>
+                    </tr>
+                </thead>
+                <tbody id="log-list"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+    import { getDatabase, ref, set, onValue, push, remove, query, limitToLast } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
+
+    const config = { databaseURL: "https://iea-pendaftaran-default-rtdb.asia-southeast1.firebasedatabase.app" };
+    const app = initializeApp(config);
+    const db = getDatabase(app);
+
+    let isAdmin = false;
+
+    // Timer
+    setInterval(() => { 
+        const opts = { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+        document.getElementById('clock').innerText = new Intl.DateTimeFormat('en-US', opts).format(new Date()) + " WIB";
+    }, 1000);
+
+    // Validation
+    const nameInp = document.getElementById('name');
+    const dateInp = document.getElementById('birthdate');
+    const tiktokInp = document.getElementById('tiktok');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function validate() {
+        let isNameValid = /^[a-zA-Z\s]{3,}$/.test(nameInp.value);
+        let age = dateInp.value ? new Date().getFullYear() - new Date(dateInp.value).getFullYear() : 0;
+        let isAgeValid = age >= 15 && age <= 40;
+        let isTiktokValid = tiktokInp.value.includes('tiktok.com');
+
+        nameInp.className = nameInp.value ? (isNameValid ? 'valid' : 'invalid') : '';
+        dateInp.className = dateInp.value ? (isAgeValid ? 'valid' : 'invalid') : '';
+        if(dateInp.value) document.getElementById('age-hint').innerText = `Usia: ${age} thn. ${isAgeValid ? '√' : '(Harus 15-40)'}`;
+        
+        submitBtn.disabled = !(isNameValid && isAgeValid && isTiktokValid);
+    }
+    [nameInp, dateInp, tiktokInp].forEach(el => el.addEventListener('input', validate));
+
+    // Admin
+    window.adminLogin = () => {
+        if(isAdmin) { isAdmin = false; render(); document.getElementById('loginBtn').innerText="LOGIN"; return; }
+        if(prompt("KODE OTORITAS:") === "IEA2026") { isAdmin = true; render(); document.getElementById('loginBtn').innerText="LOGOUT"; }
+    };
+
+    // Database: iea_grup_2
+    window.submitData = async () => {
+        const n = nameInp.value.trim();
+        const b = dateInp.value;
+        let t = tiktokInp.value.trim();
+        if(!t.startsWith('http')) t = 'https://' + t;
+        const age = new Date().getFullYear() - new Date(b).getFullYear();
+
+        try {
+            await set(push(ref(db, 'iea_grup_2')), { n, a: age, b, t, ts: Date.now() });
+            document.getElementById('form-box').style.display = "none";
+            document.getElementById('c-name').innerText = n;
+            document.getElementById('c-bday').innerText = "TGL: " + b;
+            document.getElementById('c-tiktok').innerText = "TIKTOK: " + (t.split('@')[1] || "USER");
+            document.getElementById('cv-result').style.display = "block";
+        } catch(e) { alert("Koneksi gagal!"); }
+    };
+
+    function render() {
+        // MEMBACA DARI iea_grup_2
+        onValue(query(ref(db, 'iea_grup_2'), limitToLast(20)), snap => {
+            const list = document.getElementById('log-list');
+            const head = document.getElementById('table-head');
+            list.innerHTML = '';
+            head.innerHTML = isAdmin ? `<th>NAMA</th><th>TIKTOK</th><th>AKSI</th>` : `<th>OPERATOR</th><th>USIA</th><th>STATUS</th>`;
+
+            let items = []; snap.forEach(c => { items.push({key:c.key, ...c.val()}); });
+            items.reverse().forEach(d => {
+                if(isAdmin) {
+                    const link = d.t.startsWith('http') ? d.t : `https://${d.t}`;
+                    list.innerHTML += `<tr><td>${d.n}</td><td><a href="${link}" target="_blank" style="color:cyan">LINK</a></td><td><button class="del-btn" onclick="deleteData('${d.key}')">HAPUS</button></td></tr>`;
+                } else {
+                    list.innerHTML += `<tr><td>${d.n.substring(0,15)}</td><td>${d.a} Thn</td><td style="color:var(--success)">TERDAFTAR</td></tr>`;
+                }
+            });
+        });
+    }
+
+    window.deleteData = (k) => { if(confirm("Hapus?")) remove(ref(db, `iea_grup_2/${k}`)); };
+    window.saveCard = () => {
+        html2canvas(document.querySelector("#id-card"), {scale:2, backgroundColor:'#000'}).then(canvas => {
+            const a = document.createElement('a'); a.download = 'IEA-MEMBER2.png'; a.href = canvas.toDataURL(); a.click();
+        });
+    };
+    render();
+
+    // Star BG
+    const c = document.getElementById('canvas'); const x = c.getContext('2d');
+    function res() { c.width = window.innerWidth; c.height = window.innerHeight; }
+    window.onresize = res; res();
+    function anim() {
+        x.clearRect(0,0,c.width,c.height); x.fillStyle = "rgba(188,19,254,0.2)";
+        for(let i=0; i<30; i++) x.fillRect(Math.random()*c.width, Math.random()*c.height, 1, 1);
+        requestAnimationFrame(anim);
+    }
+    anim();
+</script>
+</body>
+</html>
