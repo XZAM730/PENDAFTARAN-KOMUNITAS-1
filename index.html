@@ -13,70 +13,132 @@
             /* TEMA CYAN UNTUK GRUP 1 */
             --neon: #00f2ff; --bg: #00040d; --card-bg: rgba(0, 15, 30, 0.9);
             --border: rgba(0, 242, 255, 0.25); --success: #00ff88; --danger: #ff3e3e;
+            --max-width: 1200px;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { margin: 0; background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif; overflow-x: hidden; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+        html,body { height: 100%; }
+        body { margin: 0; background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif; overflow-x: hidden; -webkit-text-size-adjust:100%; }
         #canvas { position: fixed; top: 0; left: 0; z-index: -1; pointer-events: none; }
 
+        /* System bar */
         .system-bar { 
-            position: fixed; top: 0; width: 100%; padding: 10px 15px; 
-            background: rgba(0,0,0,0.95); display: flex; justify-content: space-between; 
-            font-family: 'Orbitron'; font-size: 10px; color: var(--neon); 
+            position: fixed; top: 0; width: 100%; padding: 8px 12px; 
+            background: rgba(0,0,0,0.95); display: flex; justify-content: space-between; align-items:center;
+            font-family: 'Orbitron'; font-size: 11px; color: var(--neon); 
             border-bottom: 1px solid var(--border); z-index: 1000;
         }
-        .admin-btn { cursor: pointer; border: 1px solid var(--neon); padding: 2px 8px; border-radius: 3px; }
+        .admin-btn { cursor: pointer; border: 1px solid var(--neon); padding: 6px 10px; border-radius: 4px; font-size: 11px; background:transparent; color:var(--neon); }
 
-        header { text-align: center; padding: 80px 20px 30px; }
-        h1 { font-family: 'Orbitron'; font-size: clamp(1.8rem, 8vw, 3rem); margin: 0; text-shadow: 0 0 15px var(--neon); color: #fff; }
+        header { text-align: center; padding: 84px 16px 28px; }
+        h1 { font-family: 'Orbitron'; font-size: clamp(1.6rem, 6.2vw, 2.8rem); margin: 0; text-shadow: 0 0 12px var(--neon); color: #fff; }
+        header p { color: var(--neon); font-size: 10px; letter-spacing: 4px; margin-top:8px; font-family:'Rajdhani'; }
 
-        .container { max-width: 1200px; margin: auto; padding: 0 15px 100px; display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; }
-        @media (max-width: 900px) { .container { grid-template-columns: 1fr; } }
+        /* Container & grid */
+        .container { max-width: var(--max-width); margin: 0 auto; padding: 0 16px 120px; display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; align-items:start; }
+        @media (max-width: 1000px) { .container { grid-template-columns: 1fr; padding-bottom: 80px; } }
 
-        .card { background: var(--card-bg); border: 1px solid var(--border); padding: 25px; border-radius: 8px; backdrop-filter: blur(10px); }
-        h2 { font-family: 'Orbitron'; font-size: 13px; color: var(--neon); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
+        .card { background: var(--card-bg); border: 1px solid var(--border); padding: 22px; border-radius: 10px; backdrop-filter: blur(8px); }
+        @media (max-width: 420px) { .card { padding: 16px; } }
 
-        .input-group { margin-bottom: 15px; position: relative; }
-        label { display: block; font-size: 11px; color: var(--neon); margin-bottom: 5px; font-weight: bold; text-transform: uppercase; }
+        h2 { font-family: 'Orbitron'; font-size: 12.5px; color: var(--neon); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
+
+        .input-group { margin-bottom: 12px; position: relative; }
+        label { display: block; font-size: 11px; color: var(--neon); margin-bottom: 6px; font-weight: bold; text-transform: uppercase; }
         
         input, textarea { 
-            width: 100%; background: rgba(0,242,255,0.05); border: 1px solid var(--border); 
-            padding: 14px; color: #fff; font-family: 'Rajdhani'; font-size: 16px; border-radius: 4px;
+            width: 100%; background: rgba(0,242,255,0.04); border: 1px solid var(--border); 
+            padding: 12px; color: #fff; font-family: 'Rajdhani'; font-size: 15px; border-radius: 6px;
         }
+        textarea { resize: vertical; min-height: 56px; max-height: 160px; }
 
         input.invalid { border-color: var(--danger); }
         input.valid { border-color: var(--success); }
 
-        .hint { font-size: 10px; margin-top: 4px; display: block; color: rgba(255,255,255,0.5); }
+        .hint { font-size: 11px; margin-top: 6px; display: block; color: rgba(255,255,255,0.6); }
         .hint.error { color: var(--danger); }
 
         .btn { 
-            width: 100%; padding: 18px; background: transparent; border: 1px solid var(--neon); 
+            width: 100%; padding: 14px; background: transparent; border: 1px solid var(--neon); 
             color: var(--neon); font-family: 'Orbitron'; font-weight: bold; cursor: pointer; 
-            transition: 0.3s; font-size: 12px; margin-top: 10px;
+            transition: 0.22s; font-size: 12px; margin-top: 10px; border-radius: 6px;
         }
-        .btn:hover:not(:disabled) { background: var(--neon); color: #000; box-shadow: 0 0 20px var(--neon); }
-        .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .btn:hover:not(:disabled) { background: var(--neon); color: #000; box-shadow: 0 0 18px var(--neon); transform:translateY(-2px); }
+        .btn:disabled { opacity: 0.35; cursor: not-allowed; transform:none; box-shadow:none; }
 
-        #cv-result { display: none; text-align: center; }
+        #cv-result { display: none; text-align: center; margin-top: 14px; }
         #id-card { 
-            width: 100%; max-width: 340px; height: 200px; margin: 0 auto 20px; 
+            width: 100%; max-width: 340px; height: auto; margin: 0 auto 14px; 
             background: linear-gradient(135deg, #000b1a 0%, #001a33 100%); 
-            border: 2px solid var(--neon); border-radius: 12px; padding: 20px; 
+            border: 2px solid var(--neon); border-radius: 12px; padding: 18px; 
             text-align: left; position: relative; overflow: hidden;
+        }
+        /* Make id-card scale on small screens to avoid overflow */
+        @media (max-width: 380px) {
+            #id-card { transform: scale(0.92); transform-origin: top center; }
         }
 
         .table-wrap { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 400px; }
-        th { text-align: left; color: var(--neon); font-family: 'Orbitron'; font-size: 9px; padding: 12px; border-bottom: 2px solid var(--border); }
-        td { padding: 12px; border-bottom: 1px solid rgba(0,242,255,0.1); font-size: 14px; }
-        .del-btn { background: none; border: 1px solid var(--danger); color: var(--danger); font-family: 'Orbitron'; font-size: 8px; padding: 5px 10px; cursor: pointer; border-radius: 3px; }
+        table { width: 100%; border-collapse: collapse; min-width: 360px; }
+        th { text-align: left; color: var(--neon); font-family: 'Orbitron'; font-size: 11px; padding: 10px; border-bottom: 2px solid var(--border); }
+        td { padding: 10px; border-bottom: 1px solid rgba(0,242,255,0.08); font-size: 14px; }
+
+        .del-btn { background: none; border: 1px solid var(--danger); color: var(--danger); font-family: 'Orbitron'; font-size: 11px; padding: 6px 8px; cursor: pointer; border-radius: 4px; }
+
+        /* SYSTEM LOADER (ADDED NON-INVASIVE) */
+        #system-loader {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            background: rgba(0,4,13,0.92);
+            backdrop-filter: blur(6px);
+            color: var(--neon);
+            font-family: 'Orbitron';
+            letter-spacing: 3px;
+            font-size: 13px;
+            flex-direction: column;
+            gap: 14px;
+            padding: 18px;
+            text-align: center;
+        }
+        #system-loader .bar {
+            width: 160px;
+            height: 3px;
+            background: rgba(0,242,255,0.12);
+            overflow: hidden;
+            border-radius: 3px;
+        }
+        #system-loader .bar > i {
+            display:block;
+            width:48px;
+            height:100%;
+            background: linear-gradient(90deg, rgba(0,242,255,0.06), var(--neon), rgba(0,242,255,0.06));
+            position: relative;
+            left: -48px;
+            animation: scan 1.35s linear infinite;
+        }
+        @keyframes scan { 0% { left:-48px } 100% { left:160px } }
+
+        /* small helper responsiveness */
+        @media (max-width: 640px) {
+            .system-bar { padding: 8px 10px; font-size: 10px; }
+            .container { padding: 0 12px 60px; gap: 12px; }
+            header { padding-top: 64px; }
+            h2 { margin-bottom: 12px; font-size: 12px; }
+            input, textarea { font-size: 14px; padding: 10px; }
+            .btn { padding: 12px; font-size: 12px; }
+        }
     </style>
 </head>
 <body>
 
-<canvas id="canvas"></canvas>
-<div class="system-bar">
+<canvas id="canvas" aria-hidden="true"></canvas>
+
+<!-- System bar -->
+<div class="system-bar" role="status" aria-live="polite">
     <div>IEA // DIVISI 1</div>
     <div id="clock">00:00:00 WIB</div>
     <div id="loginBtn" class="admin-btn" onclick="adminLogin()">LOGIN</div>
@@ -86,6 +148,12 @@
     <h1>IEA REGISTRASI 1</h1>
     <p style="color:var(--neon); font-size:10px; letter-spacing:4px;">KOMUNITAS ASTRONOMI - GRUP 1</p>
 </header>
+
+<!-- SYSTEM LOADER (non-invasive, appears only when triggered) -->
+<div id="system-loader" aria-hidden="true" role="alert" aria-live="assertive">
+    <div id="system-loader-text">PROCESSING</div>
+    <div class="bar"><i></i></div>
+</div>
 
 <div class="container">
     <div class="card">
@@ -113,13 +181,13 @@
         </div>
 
         <div id="cv-result">
-            <div id="id-card">
-                <div style="font-family:'Orbitron'; font-size:9px; color:var(--neon); border-bottom:1px solid var(--border); padding-bottom:5px; margin-bottom:15px;">ID ANGGOTA DIVISI 1 // 2026</div>
+            <div id="id-card" role="img" aria-label="ID Anggota IEA">
+                <div style="font-family:'Orbitron'; font-size:9px; color:var(--neon); border-bottom:1px solid var(--border); padding-bottom:5px; margin-bottom:12px;">ID ANGGOTA DIVISI 1 // 2026</div>
                 <div style="font-family:'Orbitron'; font-size:18px; color:#fff; text-transform:uppercase;" id="c-name">NAMA</div>
-                <div style="font-size:12px; color:var(--neon); margin-top:5px;" id="c-bday">TGL: -</div>
+                <div style="font-size:12px; color:var(--neon); margin-top:6px;" id="c-bday">TGL: -</div>
                 <div style="font-size:12px; color:var(--neon);" id="c-tiktok">TIKTOK: -</div>
-                <div style="margin-top:30px; color:var(--success); font-family:'Orbitron'; font-size:10px; letter-spacing:2px;">STATUS: TERVERIFIKASI</div>
-                <div style="position:absolute; bottom:10px; right:15px; opacity:0.1; font-family:'Orbitron'; font-size:40px; font-weight:bold;">IEA</div>
+                <div style="margin-top:28px; color:var(--success); font-family:'Orbitron'; font-size:10px; letter-spacing:2px;">STATUS: TERVERIFIKASI</div>
+                <div style="position:absolute; bottom:8px; right:12px; opacity:0.08; font-family:'Orbitron'; font-size:40px; font-weight:bold;">IEA</div>
             </div>
             <button class="btn" style="background:var(--success); color:#000;" onclick="saveCard()">UNDUH PNG</button>
             <a href="https://chat.whatsapp.com/DUOPhz2B44v7PPnBMqxScX" class="btn" style="display:block; text-decoration:none; text-align:center;">GABUNG GRUP 1</a>
@@ -153,7 +221,27 @@
 
     let isAdmin = false;
 
-    // Timer WIB
+    // LOADER helpers (ADDED NON-INVASIVE)
+    function showLoader(text = "PROCESSING") {
+        try {
+            const s = document.getElementById('system-loader');
+            const t = document.getElementById('system-loader-text');
+            t.innerText = text;
+            s.style.display = 'flex';
+            s.setAttribute('aria-hidden', 'false');
+        } catch(e){}
+    }
+    function hideLoader(delay = 150) {
+        setTimeout(()=> {
+            try {
+                const s = document.getElementById('system-loader');
+                s.style.display = 'none';
+                s.setAttribute('aria-hidden', 'true');
+            } catch(e){}
+        }, delay);
+    }
+
+    // Timer WIB (responsive & efficient)
     setInterval(() => { 
         const opts = { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
         document.getElementById('clock').innerText = new Intl.DateTimeFormat('en-US', opts).format(new Date()) + " WIB";
@@ -182,11 +270,14 @@
     // Fitur Admin
     window.adminLogin = () => {
         if(isAdmin) { isAdmin = false; render(); document.getElementById('loginBtn').innerText="LOGIN"; return; }
-        if(prompt("KODE OTORITAS:") === "IEA2026") { isAdmin = true; render(); document.getElementById('loginBtn').innerText="LOGOUT"; }
+        const code = prompt("KODE OTORITAS:");
+        if(code === "IEA2026") { isAdmin = true; render(); document.getElementById('loginBtn').innerText="LOGOUT"; }
     };
 
     // Jalur Database: iea_grup_1
     window.submitData = async () => {
+        // show loader immediately
+        showLoader("VERIFYING DATA");
         const n = nameInp.value.trim();
         const b = dateInp.value;
         let t = tiktokInp.value.trim();
@@ -195,16 +286,24 @@
 
         try {
             await set(push(ref(db, 'iea_grup_1')), { n, a: age, b, t, ts: Date.now() });
+            // small delay for perception then update UI
             document.getElementById('form-box').style.display = "none";
             document.getElementById('c-name').innerText = n;
             document.getElementById('c-bday').innerText = "TGL: " + b;
             document.getElementById('c-tiktok').innerText = "TIKTOK: " + (t.split('@')[1] || "USER");
             document.getElementById('cv-result').style.display = "block";
-        } catch(e) { alert("Gagal terhubung!"); }
+            // keep loader visible briefly to feel intentional
+            setTimeout(()=> hideLoader(200), 600);
+        } catch(e) { 
+            hideLoader(200);
+            alert("Gagal terhubung!");
+        }
     };
 
     function render() {
-        // Membaca hanya dari iea_grup_1
+        // show loader while syncing
+        showLoader("SYNCING DATABASE");
+        // Membaca hanya dari iea_grup_1, limited items
         onValue(query(ref(db, 'iea_grup_1'), limitToLast(20)), snap => {
             const list = document.getElementById('log-list');
             const head = document.getElementById('table-head');
@@ -214,33 +313,82 @@
             let items = []; snap.forEach(c => { items.push({key:c.key, ...c.val()}); });
             items.reverse().forEach(d => {
                 if(isAdmin) {
-                    const link = d.t.startsWith('http') ? d.t : `https://${d.t}`;
-                    list.innerHTML += `<tr><td>${d.n}</td><td><a href="${link}" target="_blank" style="color:cyan">BUKA ↗</a></td><td><button class="del-btn" onclick="deleteData('${d.key}')">HAPUS</button></td></tr>`;
+                    const link = d.t && d.t.startsWith('http') ? d.t : (d.t ? `https://${d.t}` : '#');
+                    list.innerHTML += `<tr><td>${escapeHtml(String(d.n || ''))}</td><td><a href="${escapeHtml(link)}" target="_blank" style="color:cyan">BUKA ↗</a></td><td><button class="del-btn" onclick="deleteData('${d.key}')">HAPUS</button></td></tr>`;
                 } else {
-                    list.innerHTML += `<tr><td>${d.n.substring(0,15)}</td><td>${d.a} Thn</td><td style="color:var(--success)">TERDAFTAR</td></tr>`;
+                    list.innerHTML += `<tr><td>${escapeHtml(String((d.n||'').substring(0,15)))}</td><td>${escapeHtml(String(d.a || '0'))} Thn</td><td style="color:var(--success)">TERDAFTAR</td></tr>`;
                 }
             });
+            // hide loader when data loaded
+            hideLoader(200);
+        }, (err) => {
+            // on error, hide loader and optionally alert
+            hideLoader(200);
+            console.error(err);
         });
     }
 
-    window.deleteData = (k) => { if(confirm("Hapus pendaftar?")) remove(ref(db, `iea_grup_1/${k}`)); };
-    window.saveCard = () => {
-        html2canvas(document.querySelector("#id-card"), {scale:2, backgroundColor:'#000'}).then(canvas => {
-            const a = document.createElement('a'); a.download = 'IEA-MEMBER1.png'; a.href = canvas.toDataURL(); a.click();
+    window.deleteData = (k) => { 
+        if(!confirm("Hapus pendaftar?")) return;
+        showLoader("DELETING DATA");
+        remove(ref(db, `iea_grup_1/${k}`)).then(()=> {
+            // visual delay
+            setTimeout(()=> hideLoader(200), 500);
+        }).catch(err => {
+            hideLoader(200);
+            console.error(err);
+            alert("Gagal menghapus.");
         });
     };
+
+    window.saveCard = () => {
+        // show loader while generating
+        showLoader("GENERATING ID CARD");
+        html2canvas(document.querySelector("#id-card"), {scale:2, backgroundColor:'#000'}).then(canvas => {
+            const a = document.createElement('a'); a.download = 'IEA-MEMBER1.png'; a.href = canvas.toDataURL(); a.click();
+            // hide loader after generation
+            hideLoader(180);
+        }).catch(err => {
+            hideLoader(180);
+            console.error(err);
+            alert("Gagal mengunduh.");
+        });
+    };
+
+    // initial render call
     render();
 
-    // Background Stars
+    // Background Stars (responsive & efficient)
     const c = document.getElementById('canvas'); const x = c.getContext('2d');
-    function res() { c.width = window.innerWidth; c.height = window.innerHeight; }
-    window.onresize = res; res();
+    function res() { 
+        const dpr = window.devicePixelRatio || 1;
+        c.width = Math.floor(window.innerWidth * dpr);
+        c.height = Math.floor(window.innerHeight * dpr);
+        c.style.width = window.innerWidth + 'px';
+        c.style.height = window.innerHeight + 'px';
+        x.setTransform(dpr,0,0,dpr,0,0);
+    }
+    window.addEventListener('resize', res, {passive:true}); res();
+    // draw stars efficiently with reduced count on small devices
     function anim() {
-        x.clearRect(0,0,c.width,c.height); x.fillStyle = "rgba(0,242,255,0.2)";
-        for(let i=0; i<30; i++) x.fillRect(Math.random()*c.width, Math.random()*c.height, 1, 1);
+        x.clearRect(0,0,c.width,c.height);
+        const count = (window.innerWidth < 500) ? 18 : (window.innerWidth < 900 ? 26 : 34);
+        x.fillStyle = "rgba(0,242,255,0.18)";
+        for(let i=0;i<count;i++){
+            x.fillRect(Math.random()*c.width/ (window.devicePixelRatio||1), Math.random()*c.height/(window.devicePixelRatio||1), 1, 1);
+        }
         requestAnimationFrame(anim);
     }
     anim();
+
+    // small helper to escape potential text inserted into table (safety)
+    function escapeHtml(s) {
+        return s.replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; });
+    }
+
+    // Accessibility: allow Enter key on submit for mobile keyboards
+    document.getElementById('tiktok').addEventListener('keydown', function(e){ if(e.key === 'Enter' && !submitBtn.disabled) submitData(); });
+
 </script>
 </body>
-</html>
+                </html>
