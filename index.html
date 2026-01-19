@@ -5,210 +5,280 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>IEA | Pendaftaran Komunitas 1</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
         :root {
-            /* TEMA CYAN UNTUK GRUP 1 */
-            --neon: #00f2ff; --bg: #00040d; --card-bg: rgba(0, 15, 30, 0.9);
-            --border: rgba(0, 242, 255, 0.25); --success: #00ff88; --danger: #ff3e3e;
+            /* TEMA IEA: UNGU NEON & ORANYE (SAMA DENGAN PORTAL) */
+            --bg: #050508; 
+            --accent: #bc13fe;       /* Ungu Neon Utama */
+            --accent-sec: #ff4500;   /* Oranye Sekunder */
+            --accent-glow: rgba(188, 19, 254, 0.6);
+            
+            --card-bg: rgba(20, 10, 25, 0.8);
+            --border: rgba(255, 255, 255, 0.1);
+            --success: #00ff88; 
+            --danger: #ff3e3e;
             --max-width: 1200px;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; -webkit-font-smoothing:antialiased; }
         html,body { height: 100%; }
-        body { margin: 0; background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif; overflow-x: hidden; -webkit-text-size-adjust:100%; }
-        #canvas { position: fixed; top: 0; left: 0; z-index: -1; pointer-events: none; }
+        body { 
+            margin: 0; background: var(--bg); color: #fff; 
+            font-family: 'Rajdhani', sans-serif; overflow-x: hidden; 
+            /* BACKGROUND PARTIKEL WARNA IEA */
+            background-image: 
+                radial-gradient(var(--accent-glow), transparent 2px), 
+                radial-gradient(rgba(255, 69, 0, 0.5), transparent 2px), 
+                radial-gradient(var(--accent), transparent 1px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+            background-position: 0 0, 40px 60px, 130px 270px;
+        }
+
+        /* --- TEXTURE LAYER (KACA PECAH) --- */
+        .texture-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -10; opacity: 0.3; pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)' opacity='0.4'/%3E%3C/svg%3E");
+            filter: contrast(150%) brightness(70%) blur(5px); mix-blend-mode: overlay;
+        }
+
+        /* --- AMBIENT GLOW --- */
+        body::before, body::after {
+            content: ''; position: fixed; width: 60vw; height: 60vw; border-radius: 50%;
+            filter: blur(120px); opacity: 0.2; z-index: -2; animation: orbit 15s infinite alternate ease-in-out;
+        }
+        body::before { background: radial-gradient(circle, var(--accent), transparent 70%); top: -20%; left: -20%; }
+        body::after { background: radial-gradient(circle, var(--accent-sec), transparent 70%); bottom: -20%; right: -20%; animation-delay: -7s; }
+        @keyframes orbit { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
+
+        /* --- LOADING SCREEN (LOGO IEA ANIMATION) --- */
+        #loader-overlay {
+            position: fixed; inset: 0; background: #050508; z-index: 20000; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.8s ease; pointer-events: none;
+        }
+        .loader-text { 
+            font-family: 'Orbitron'; color: var(--accent-sec); margin-top: 30px; letter-spacing: 5px; font-weight: bold; font-size: 0.9rem;
+            text-shadow: 0 0 15px var(--accent-sec); animation: textPulse 0.5s infinite alternate;
+        }
+        .loader-logo-wrap { width: 150px; height: 150px; }
+        @keyframes textPulse { from{opacity:0.6} to{opacity:1} }
+
+        /* SVG ANIMATION STYLES */
+        .logo-svg { overflow: visible; filter: drop-shadow(0 0 15px var(--accent)) drop-shadow(0 0 25px var(--accent-sec)); }
+        .ring { fill: none; stroke-width: 5; vector-effect: non-scaling-stroke; filter: drop-shadow(0 0 8px currentColor); }
+        .ring-1 { stroke: var(--accent); transform-origin: center; animation: ringSpin 4s linear infinite; }
+        .ring-2 { stroke: var(--accent-sec); transform-origin: center; animation: ringSpinRev 3s linear infinite; }
+        
+        @keyframes ringSpin { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.1); } 100% { transform: rotate(360deg) scale(1); } }
+        @keyframes ringSpinRev { 0% { transform: rotate(0deg) scale(1.1); } 50% { transform: rotate(-180deg) scale(1); } 100% { transform: rotate(-360deg) scale(1.1); } }
+
+        /* --- MAIN CONTENT WRAPPER --- */
+        .wrap-content { opacity: 0; transition: opacity 1.5s ease; }
 
         /* System bar */
         .system-bar { 
             position: fixed; top: 0; width: 100%; padding: 8px 12px; 
-            background: rgba(0,0,0,0.95); display: flex; justify-content: space-between; align-items:center;
-            font-family: 'Orbitron'; font-size: 11px; color: var(--neon); 
+            background: rgba(5, 5, 8, 0.9); backdrop-filter: blur(10px);
+            display: flex; justify-content: space-between; align-items:center;
+            font-family: 'Orbitron'; font-size: 11px; color: var(--accent); 
             border-bottom: 1px solid var(--border); z-index: 1000;
         }
-        .admin-btn { cursor: pointer; border: 1px solid var(--neon); padding: 6px 10px; border-radius: 4px; font-size: 11px; background:transparent; color:var(--neon); }
+        .admin-btn { cursor: pointer; border: 1px solid var(--accent); padding: 6px 10px; border-radius: 4px; font-size: 11px; background:transparent; color:var(--accent); transition:0.3s; }
+        .admin-btn:hover { background: var(--accent); color: #fff; }
 
-        header { text-align: center; padding: 84px 16px 28px; }
-        h1 { font-family: 'Orbitron'; font-size: clamp(1.6rem, 6.2vw, 2.8rem); margin: 0; text-shadow: 0 0 12px var(--neon); color: #fff; }
-        header p { color: var(--neon); font-size: 10px; letter-spacing: 4px; margin-top:8px; font-family:'Rajdhani'; }
+        /* Header */
+        header { text-align: center; padding: 100px 16px 40px; }
+        /* Logo Header Kecil */
+        .header-logo { width: 80px; height: 80px; margin: 0 auto 20px; display: block; }
 
-        /* Container & grid */
-        .container { max-width: var(--max-width); margin: 0 auto; padding: 0 16px 120px; display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; align-items:start; }
+        h1 { font-family: 'Orbitron'; font-size: clamp(1.6rem, 5vw, 2.5rem); margin: 0; text-shadow: 0 0 20px var(--accent); color: #fff; }
+        .iea-glow { color: var(--accent); text-shadow: 0 0 15px var(--accent); }
+        header p { color: var(--accent-sec); font-size: 11px; letter-spacing: 4px; margin-top:10px; font-family:'JetBrains Mono'; opacity:0.8; }
+
+        /* Container & Grid */
+        .container { max-width: var(--max-width); margin: 0 auto; padding: 0 16px 120px; display: grid; grid-template-columns: 1fr 1.2fr; gap: 25px; align-items:start; }
         @media (max-width: 1000px) { .container { grid-template-columns: 1fr; padding-bottom: 80px; } }
 
-        .card { background: var(--card-bg); border: 1px solid var(--border); padding: 22px; border-radius: 10px; backdrop-filter: blur(8px); }
-        @media (max-width: 420px) { .card { padding: 16px; } }
+        .card { 
+            background: var(--card-bg); border: 1px solid var(--border); padding: 25px; border-radius: 15px; 
+            backdrop-filter: blur(15px); box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+        }
+        .card:hover { border-color: rgba(188, 19, 254, 0.3); transform: translateY(-3px); }
 
-        h2 { font-family: 'Orbitron'; font-size: 12.5px; color: var(--neon); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
+        h2 { font-family: 'Orbitron'; font-size: 13px; color: var(--accent); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
 
-        .input-group { margin-bottom: 12px; position: relative; }
-        label { display: block; font-size: 11px; color: var(--neon); margin-bottom: 6px; font-weight: bold; text-transform: uppercase; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-size: 11px; color: var(--accent-sec); margin-bottom: 8px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
         
         input, textarea { 
-            width: 100%; background: rgba(0,242,255,0.04); border: 1px solid var(--border); 
-            padding: 12px; color: #fff; font-family: 'Rajdhani'; font-size: 15px; border-radius: 6px;
+            width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); 
+            padding: 14px; color: #fff; font-family: 'Rajdhani'; font-size: 16px; border-radius: 8px;
+            transition: 0.3s;
         }
-        textarea { resize: vertical; min-height: 56px; max-height: 160px; }
+        input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(188, 19, 254, 0.2); }
+        textarea { resize: vertical; min-height: 80px; }
 
         input.invalid { border-color: var(--danger); }
         input.valid { border-color: var(--success); }
 
-        .hint { font-size: 11px; margin-top: 6px; display: block; color: rgba(255,255,255,0.6); }
-        .hint.error { color: var(--danger); }
-
+        .hint { font-size: 11px; margin-top: 6px; display: block; color: rgba(255,255,255,0.5); }
+        
         .btn { 
-            width: 100%; padding: 14px; background: transparent; border: 1px solid var(--neon); 
-            color: var(--neon); font-family: 'Orbitron'; font-weight: bold; cursor: pointer; 
-            transition: 0.22s; font-size: 12px; margin-top: 10px; border-radius: 6px;
+            width: 100%; padding: 15px; background: transparent; border: 1px solid var(--accent); 
+            color: var(--accent); font-family: 'Orbitron'; font-weight: bold; cursor: pointer; 
+            transition: 0.3s; font-size: 12px; margin-top: 15px; border-radius: 8px; letter-spacing: 2px;
         }
-        .btn:hover:not(:disabled) { background: var(--neon); color: #000; box-shadow: 0 0 18px var(--neon); transform:translateY(-2px); }
-        .btn:disabled { opacity: 0.35; cursor: not-allowed; transform:none; box-shadow:none; }
+        .btn:hover:not(:disabled) { background: var(--accent); color: #fff; box-shadow: 0 0 25px var(--accent); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; border-color: #555; color: #555; }
 
-        #cv-result { display: none; text-align: center; margin-top: 14px; }
+        /* ID CARD STYLE (Updated Colors) */
+        #cv-result { display: none; text-align: center; margin-top: 20px; }
         #id-card { 
-            width: 100%; max-width: 340px; height: auto; margin: 0 auto 14px; 
-            background: linear-gradient(135deg, #000b1a 0%, #001a33 100%); 
-            border: 2px solid var(--neon); border-radius: 12px; padding: 18px; 
+            width: 100%; max-width: 350px; height: auto; margin: 0 auto 20px; 
+            /* Gradient Ungu ke Hitam */
+            background: linear-gradient(135deg, #1a0525 0%, #050508 100%); 
+            border: 1px solid var(--accent); border-radius: 15px; padding: 25px; 
             text-align: left; position: relative; overflow: hidden;
+            box-shadow: 0 0 30px rgba(188, 19, 254, 0.15);
         }
-        /* Make id-card scale on small screens to avoid overflow */
-        @media (max-width: 380px) {
-            #id-card { transform: scale(0.92); transform-origin: top center; }
+        #id-card::before {
+            content:''; position: absolute; top:-50px; right:-50px; width:150px; height:150px;
+            background: radial-gradient(circle, var(--accent) 0%, transparent 70%); opacity:0.2; filter:blur(20px);
         }
 
         .table-wrap { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; min-width: 360px; }
-        th { text-align: left; color: var(--neon); font-family: 'Orbitron'; font-size: 11px; padding: 10px; border-bottom: 2px solid var(--border); }
-        td { padding: 10px; border-bottom: 1px solid rgba(0,242,255,0.08); font-size: 14px; }
+        th { text-align: left; color: var(--accent); font-family: 'Orbitron'; font-size: 11px; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
+        .del-btn { background: none; border: 1px solid var(--danger); color: var(--danger); font-family: 'Orbitron'; font-size: 10px; padding: 5px 10px; cursor: pointer; border-radius: 4px; }
 
-        .del-btn { background: none; border: 1px solid var(--danger); color: var(--danger); font-family: 'Orbitron'; font-size: 11px; padding: 6px 8px; cursor: pointer; border-radius: 4px; }
-
-        /* SYSTEM LOADER (ADDED NON-INVASIVE) */
+        /* SYSTEM PROCESS LOADER (Small pop-up) */
         #system-loader {
-            position: fixed;
-            inset: 0;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 99999;
-            background: rgba(0,4,13,0.92);
-            backdrop-filter: blur(6px);
-            color: var(--neon);
-            font-family: 'Orbitron';
-            letter-spacing: 3px;
-            font-size: 13px;
-            flex-direction: column;
-            gap: 14px;
-            padding: 18px;
-            text-align: center;
+            position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 99999;
+            background: rgba(5,5,8,0.9); backdrop-filter: blur(8px);
+            color: var(--accent); font-family: 'Orbitron'; font-size: 12px; letter-spacing: 2px;
+            flex-direction: column; gap: 15px;
         }
-        #system-loader .bar {
-            width: 160px;
-            height: 3px;
-            background: rgba(0,242,255,0.12);
-            overflow: hidden;
-            border-radius: 3px;
-        }
-        #system-loader .bar > i {
-            display:block;
-            width:48px;
-            height:100%;
-            background: linear-gradient(90deg, rgba(0,242,255,0.06), var(--neon), rgba(0,242,255,0.06));
-            position: relative;
-            left: -48px;
-            animation: scan 1.35s linear infinite;
-        }
-        @keyframes scan { 0% { left:-48px } 100% { left:160px } }
+        .spinner { width: 40px; height: 40px; border: 3px solid rgba(188, 19, 254, 0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* small helper responsiveness */
         @media (max-width: 640px) {
-            .system-bar { padding: 8px 10px; font-size: 10px; }
-            .container { padding: 0 12px 60px; gap: 12px; }
-            header { padding-top: 64px; }
-            h2 { margin-bottom: 12px; font-size: 12px; }
-            input, textarea { font-size: 14px; padding: 10px; }
-            .btn { padding: 12px; font-size: 12px; }
+            .container { padding: 0 16px 60px; gap: 20px; }
+            h1 { font-size: 1.8rem; }
+            .card { padding: 20px; }
         }
     </style>
 </head>
 <body>
 
-<canvas id="canvas" aria-hidden="true"></canvas>
+<div class="texture-layer"></div>
 
-<!-- System bar -->
-<div class="system-bar" role="status" aria-live="polite">
-    <div>IEA // DIVISI 1</div>
-    <div id="clock">00:00:00 WIB</div>
-    <div id="loginBtn" class="admin-btn" onclick="adminLogin()">LOGIN</div>
+<div id="loader-overlay">
+    <div class="loader-logo-wrap">
+        <svg class="logo-svg" viewBox="0 0 200 200" style="width:100%; height:100%;">
+            <ellipse class="ring ring-1" cx="100" cy="100" rx="90" ry="30" />
+            <ellipse class="ring ring-2" cx="100" cy="100" rx="90" ry="30" />
+            <text x="50%" y="55%" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-family="Orbitron" font-weight="900" font-size="50" style="filter: drop-shadow(0 0 15px #fff);">IEA</text>
+        </svg>
+    </div>
+    <div class="loader-text" id="loaderMsg">INITIALIZING...</div>
 </div>
 
-<header>
-    <h1>IEA REGISTRASI 1</h1>
-    <p style="color:var(--neon); font-size:10px; letter-spacing:4px;">KOMUNITAS ASTRONOMI - GRUP 1</p>
-</header>
+<div class="wrap-content" id="main-content">
+    
+    <div class="system-bar">
+        <div>IEA // DIVISI 1</div>
+        <div id="clock" style="font-family:'JetBrains Mono'">00:00:00 WIB</div>
+        <div id="loginBtn" class="admin-btn" onclick="adminLogin()">LOGIN</div>
+    </div>
 
-<!-- SYSTEM LOADER (non-invasive, appears only when triggered) -->
-<div id="system-loader" aria-hidden="true" role="alert" aria-live="assertive">
-    <div id="system-loader-text">PROCESSING</div>
-    <div class="bar"><i></i></div>
-</div>
+    <header>
+        <div class="header-logo">
+            <svg class="logo-svg" viewBox="0 0 200 200" style="width:100%; height:100%;">
+                <ellipse class="ring ring-1" cx="100" cy="100" rx="90" ry="30" />
+                <ellipse class="ring ring-2" cx="100" cy="100" rx="90" ry="30" />
+                <text x="50%" y="55%" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-family="Orbitron" font-weight="900" font-size="50">IEA</text>
+            </svg>
+        </div>
+        <h1>IEA <span class="iea-glow">REGISTRASI</span> 1</h1>
+        <p>INTERNATIONAL EDUCATION ASTRONOMY - COMMUNITY 1</p>
+    </header>
 
-<div class="container">
-    <div class="card">
-        <h2>IDENTIFIKASI ANGGOTA</h2>
-        <div id="form-box">
-            <div class="input-group">
-                <label>Nama Lengkap</label>
-                <input type="text" id="name" placeholder="Nama anda..." maxlength="30">
-                <span class="hint" id="name-hint">Min. 3 huruf, tanpa angka.</span>
+    <div class="container">
+        <div class="card">
+            <h2>IDENTIFIKASI ANGGOTA</h2>
+            <div id="form-box">
+                <div class="input-group">
+                    <label>Nama Lengkap</label>
+                    <input type="text" id="name" placeholder="Nama asli..." maxlength="30">
+                    <span class="hint" id="name-hint">Min. 3 huruf, tanpa angka.</span>
+                </div>
+                <div class="input-group">
+                    <label>Tanggal Lahir</label>
+                    <input type="date" id="birthdate">
+                    <span class="hint" id="age-hint">Syarat usia: 15 - 40 tahun.</span>
+                </div>
+                <div class="input-group">
+                    <label>Link Profil TikTok</label>
+                    <input type="url" id="tiktok" placeholder="tiktok.com/@username">
+                </div>
+                <div class="input-group">
+                    <label>Alasan Bergabung</label>
+                    <textarea id="reason" rows="2" placeholder="Tulis alasan singkat..."></textarea>
+                </div>
+                <button class="btn" id="submitBtn" onclick="submitData()" disabled>KIRIM DATA</button>
             </div>
-            <div class="input-group">
-                <label>Tanggal Lahir</label>
-                <input type="date" id="birthdate">
-                <span class="hint" id="age-hint">Syarat usia: 15 - 40 tahun.</span>
+
+            <div id="cv-result">
+                <div id="id-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px; margin-bottom:15px;">
+                        <span style="font-family:'Orbitron'; font-size:10px; color:var(--accent);">IEA MEMBER CARD</span>
+                        <span style="font-family:'JetBrains Mono'; font-size:10px; color:#fff;">2026</span>
+                    </div>
+                    
+                    <div style="font-family:'Orbitron'; font-size:20px; color:#fff; text-transform:uppercase; margin-bottom:5px; text-shadow:0 0 10px var(--accent);" id="c-name">NAMA</div>
+                    <div style="font-size:11px; color:var(--accent-sec); margin-bottom:15px; letter-spacing:1px;" id="c-role">JUNIOR ASTRONOMER</div>
+                    
+                    <div style="font-size:12px; color:#ccc; margin-bottom:4px;" id="c-bday">TGL: -</div>
+                    <div style="font-size:12px; color:#ccc;" id="c-tiktok">TIKTOK: -</div>
+                    
+                    <div style="margin-top:25px; padding-top:10px; border-top:1px dashed rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center;">
+                         <span style="color:var(--success); font-family:'Orbitron'; font-size:9px; letter-spacing:1px;">● VERIFIED</span>
+                         <span style="color:var(--accent); font-family:'Orbitron'; font-size:12px; font-weight:bold;">IEA</span>
+                    </div>
+                </div>
+                <button class="btn" style="background:var(--success); color:#000; border-color:var(--success);" onclick="saveCard()">UNDUH KARTU</button>
+                <a href="https://chat.whatsapp.com/DUOPhz2B44v7PPnBMqxScX" class="btn" style="display:block; text-decoration:none; text-align:center;">GABUNG WHATSAPP</a>
             </div>
-            <div class="input-group">
-                <label>Link Profil TikTok</label>
-                <input type="url" id="tiktok" placeholder="tiktok.com/@username">
-            </div>
-            <div class="input-group">
-                <label>Alasan Bergabung</label>
-                <textarea id="reason" rows="2" placeholder="Tulis alasan singkat..."></textarea>
-            </div>
-            <button class="btn" id="submitBtn" onclick="submitData()" disabled>KIRIM DATA GRUP 1</button>
         </div>
 
-        <div id="cv-result">
-            <div id="id-card" role="img" aria-label="ID Anggota IEA">
-                <div style="font-family:'Orbitron'; font-size:9px; color:var(--neon); border-bottom:1px solid var(--border); padding-bottom:5px; margin-bottom:12px;">ID ANGGOTA DIVISI 1 // 2026</div>
-                <div style="font-family:'Orbitron'; font-size:18px; color:#fff; text-transform:uppercase;" id="c-name">NAMA</div>
-                <div style="font-size:12px; color:var(--neon); margin-top:6px;" id="c-bday">TGL: -</div>
-                <div style="font-size:12px; color:var(--neon);" id="c-tiktok">TIKTOK: -</div>
-                <div style="margin-top:28px; color:var(--success); font-family:'Orbitron'; font-size:10px; letter-spacing:2px;">STATUS: TERVERIFIKASI</div>
-                <div style="position:absolute; bottom:8px; right:12px; opacity:0.08; font-family:'Orbitron'; font-size:40px; font-weight:bold;">IEA</div>
+        <div class="card">
+            <h2>DATABASE AKTIVITAS</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr id="table-head">
+                            <th>ANGGOTA</th>
+                            <th>USIA</th>
+                            <th>STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="log-list"></tbody>
+                </table>
             </div>
-            <button class="btn" style="background:var(--success); color:#000;" onclick="saveCard()">UNDUH PNG</button>
-            <a href="https://chat.whatsapp.com/DUOPhz2B44v7PPnBMqxScX" class="btn" style="display:block; text-decoration:none; text-align:center;">GABUNG GRUP 1</a>
         </div>
     </div>
 
-    <div class="card">
-        <h2>LOG AKTIVITAS GRUP 1</h2>
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr id="table-head">
-                        <th>OPERATOR</th>
-                        <th>USIA</th>
-                        <th>STATUS</th>
-                    </tr>
-                </thead>
-                <tbody id="log-list"></tbody>
-            </table>
-        </div>
-    </div>
+</div>
+
+<div id="system-loader">
+    <div class="spinner"></div>
+    <div id="system-loader-text">PROCESSING DATA...</div>
 </div>
 
 <script type="module">
@@ -221,33 +291,40 @@
 
     let isAdmin = false;
 
-    // LOADER helpers (ADDED NON-INVASIVE)
-    function showLoader(text = "PROCESSING") {
-        try {
-            const s = document.getElementById('system-loader');
-            const t = document.getElementById('system-loader-text');
-            t.innerText = text;
-            s.style.display = 'flex';
-            s.setAttribute('aria-hidden', 'false');
-        } catch(e){}
+    // --- LOADING SCREEN LOGIC (SAMA SEPERTI PORTAL) ---
+    window.onload = () => {
+        const loader = document.getElementById('loader-overlay');
+        const content = document.getElementById('main-content');
+        
+        // Tampilkan Loading
+        loader.style.opacity = '1';
+
+        // Tunggu 3 detik lalu buka konten
+        setTimeout(() => {
+            loader.style.opacity = '0';
+            setTimeout(() => { loader.style.display = 'none'; }, 800);
+            
+            content.style.opacity = '1';
+        }, 2500);
+    };
+
+    // System Process Loader (Kecil)
+    function showProcLoader(text) {
+        const s = document.getElementById('system-loader');
+        document.getElementById('system-loader-text').innerText = text;
+        s.style.display = 'flex';
     }
-    function hideLoader(delay = 150) {
-        setTimeout(()=> {
-            try {
-                const s = document.getElementById('system-loader');
-                s.style.display = 'none';
-                s.setAttribute('aria-hidden', 'true');
-            } catch(e){}
-        }, delay);
+    function hideProcLoader() {
+        setTimeout(() => { document.getElementById('system-loader').style.display = 'none'; }, 500);
     }
 
-    // Timer WIB (responsive & efficient)
+    // Timer WIB
     setInterval(() => { 
         const opts = { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
         document.getElementById('clock').innerText = new Intl.DateTimeFormat('en-US', opts).format(new Date()) + " WIB";
     }, 1000);
 
-    // Validasi Real-time
+    // Validasi Input
     const nameInp = document.getElementById('name');
     const dateInp = document.getElementById('birthdate');
     const tiktokInp = document.getElementById('tiktok');
@@ -257,7 +334,7 @@
         let isNameValid = /^[a-zA-Z\s]{3,}$/.test(nameInp.value);
         let age = dateInp.value ? new Date().getFullYear() - new Date(dateInp.value).getFullYear() : 0;
         let isAgeValid = age >= 15 && age <= 40;
-        let isTiktokValid = tiktokInp.value.includes('tiktok.com');
+        let isTiktokValid = tiktokInp.value.toLowerCase().includes('tiktok.com');
 
         nameInp.className = nameInp.value ? (isNameValid ? 'valid' : 'invalid') : '';
         dateInp.className = dateInp.value ? (isAgeValid ? 'valid' : 'invalid') : '';
@@ -267,17 +344,16 @@
     }
     [nameInp, dateInp, tiktokInp].forEach(el => el.addEventListener('input', validate));
 
-    // Fitur Admin
+    // Admin
     window.adminLogin = () => {
         if(isAdmin) { isAdmin = false; render(); document.getElementById('loginBtn').innerText="LOGIN"; return; }
-        const code = prompt("KODE OTORITAS:");
+        const code = prompt("KODE OTORITAS IEA:");
         if(code === "IEA2026") { isAdmin = true; render(); document.getElementById('loginBtn').innerText="LOGOUT"; }
     };
 
-    // Jalur Database: iea_grup_1
+    // Submit Data
     window.submitData = async () => {
-        // show loader immediately
-        showLoader("VERIFYING DATA");
+        showProcLoader("MENGHUBUNGKAN DATABASE...");
         const n = nameInp.value.trim();
         const b = dateInp.value;
         let t = tiktokInp.value.trim();
@@ -286,109 +362,74 @@
 
         try {
             await set(push(ref(db, 'iea_grup_1')), { n, a: age, b, t, ts: Date.now() });
-            // small delay for perception then update UI
+            
             document.getElementById('form-box').style.display = "none";
             document.getElementById('c-name').innerText = n;
-            document.getElementById('c-bday').innerText = "TGL: " + b;
-            document.getElementById('c-tiktok').innerText = "TIKTOK: " + (t.split('@')[1] || "USER");
+            document.getElementById('c-bday').innerText = "LAHIR: " + b;
+            document.getElementById('c-tiktok').innerText = "ID: @" + (t.split('@')[1]?.split('?')[0] || "USER");
             document.getElementById('cv-result').style.display = "block";
-            // keep loader visible briefly to feel intentional
-            setTimeout(()=> hideLoader(200), 600);
+            
+            hideProcLoader();
         } catch(e) { 
-            hideLoader(200);
-            alert("Gagal terhubung!");
+            hideProcLoader();
+            alert("Koneksi Gagal! Coba lagi.");
         }
     };
 
+    // Render Table
     function render() {
-        // show loader while syncing
-        showLoader("SYNCING DATABASE");
-        // Membaca hanya dari iea_grup_1, limited items
-        onValue(query(ref(db, 'iea_grup_1'), limitToLast(20)), snap => {
+        onValue(query(ref(db, 'iea_grup_1'), limitToLast(15)), snap => {
             const list = document.getElementById('log-list');
             const head = document.getElementById('table-head');
             list.innerHTML = '';
-            head.innerHTML = isAdmin ? `<th>NAMA</th><th>TIKTOK</th><th>AKSI</th>` : `<th>OPERATOR</th><th>USIA</th><th>STATUS</th>`;
+            head.innerHTML = isAdmin ? `<th>NAMA</th><th>LINK</th><th>AKSI</th>` : `<th>ANGGOTA</th><th>USIA</th><th>STATUS</th>`;
 
             let items = []; snap.forEach(c => { items.push({key:c.key, ...c.val()}); });
             items.reverse().forEach(d => {
                 if(isAdmin) {
-                    const link = d.t && d.t.startsWith('http') ? d.t : (d.t ? `https://${d.t}` : '#');
-                    list.innerHTML += `<tr><td>${escapeHtml(String(d.n || ''))}</td><td><a href="${escapeHtml(link)}" target="_blank" style="color:cyan">BUKA ↗</a></td><td><button class="del-btn" onclick="deleteData('${d.key}')">HAPUS</button></td></tr>`;
+                    list.innerHTML += `<tr>
+                        <td style="color:#fff">${escapeHtml(d.n)}</td>
+                        <td><a href="${d.t}" target="_blank" style="color:var(--accent-sec); font-size:10px;">TIKTOK ↗</a></td>
+                        <td><button class="del-btn" onclick="deleteData('${d.key}')">HAPUS</button></td>
+                    </tr>`;
                 } else {
-                    list.innerHTML += `<tr><td>${escapeHtml(String((d.n||'').substring(0,15)))}</td><td>${escapeHtml(String(d.a || '0'))} Thn</td><td style="color:var(--success)">TERDAFTAR</td></tr>`;
+                    list.innerHTML += `<tr>
+                        <td style="color:#ddd">${escapeHtml((d.n||'').substring(0,12))}...</td>
+                        <td>${d.a} Thn</td>
+                        <td style="color:var(--success); font-size:10px; letter-spacing:1px;">TERDAFTAR</td>
+                    </tr>`;
                 }
             });
-            // hide loader when data loaded
-            hideLoader(200);
-        }, (err) => {
-            // on error, hide loader and optionally alert
-            hideLoader(200);
-            console.error(err);
         });
     }
 
     window.deleteData = (k) => { 
-        if(!confirm("Hapus pendaftar?")) return;
-        showLoader("DELETING DATA");
-        remove(ref(db, `iea_grup_1/${k}`)).then(()=> {
-            // visual delay
-            setTimeout(()=> hideLoader(200), 500);
-        }).catch(err => {
-            hideLoader(200);
-            console.error(err);
-            alert("Gagal menghapus.");
-        });
+        if(confirm("Hapus data ini?")) remove(ref(db, `iea_grup_1/${k}`));
     };
 
+    // Generate ID Card
     window.saveCard = () => {
-        // show loader while generating
-        showLoader("GENERATING ID CARD");
-        html2canvas(document.querySelector("#id-card"), {scale:2, backgroundColor:'#000'}).then(canvas => {
-            const a = document.createElement('a'); a.download = 'IEA-MEMBER1.png'; a.href = canvas.toDataURL(); a.click();
-            // hide loader after generation
-            hideLoader(180);
-        }).catch(err => {
-            hideLoader(180);
-            console.error(err);
-            alert("Gagal mengunduh.");
+        showProcLoader("MENCETAK KARTU...");
+        // Gunakan html2canvas dengan background transparan untuk menangkap border radius
+        html2canvas(document.querySelector("#id-card"), {
+            scale: 3, 
+            backgroundColor: null,
+            useCORS: true
+        }).then(canvas => {
+            const a = document.createElement('a'); 
+            a.download = 'KARTU-ANGGOTA-IEA.png'; 
+            a.href = canvas.toDataURL("image/png"); 
+            a.click();
+            hideProcLoader();
         });
     };
 
-    // initial render call
+    function escapeHtml(text) {
+        if (!text) return text;
+        return text.replace(/[&<>"']/g, function(m) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]; });
+    }
+
     render();
-
-    // Background Stars (responsive & efficient)
-    const c = document.getElementById('canvas'); const x = c.getContext('2d');
-    function res() { 
-        const dpr = window.devicePixelRatio || 1;
-        c.width = Math.floor(window.innerWidth * dpr);
-        c.height = Math.floor(window.innerHeight * dpr);
-        c.style.width = window.innerWidth + 'px';
-        c.style.height = window.innerHeight + 'px';
-        x.setTransform(dpr,0,0,dpr,0,0);
-    }
-    window.addEventListener('resize', res, {passive:true}); res();
-    // draw stars efficiently with reduced count on small devices
-    function anim() {
-        x.clearRect(0,0,c.width,c.height);
-        const count = (window.innerWidth < 500) ? 18 : (window.innerWidth < 900 ? 26 : 34);
-        x.fillStyle = "rgba(0,242,255,0.18)";
-        for(let i=0;i<count;i++){
-            x.fillRect(Math.random()*c.width/ (window.devicePixelRatio||1), Math.random()*c.height/(window.devicePixelRatio||1), 1, 1);
-        }
-        requestAnimationFrame(anim);
-    }
-    anim();
-
-    // small helper to escape potential text inserted into table (safety)
-    function escapeHtml(s) {
-        return s.replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; });
-    }
-
-    // Accessibility: allow Enter key on submit for mobile keyboards
-    document.getElementById('tiktok').addEventListener('keydown', function(e){ if(e.key === 'Enter' && !submitBtn.disabled) submitData(); });
-
 </script>
 </body>
-                </html>
+</html>
